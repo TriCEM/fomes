@@ -2,35 +2,31 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nickbrazeau/fomes/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/nickbrazeau/fomes/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/TriCEM/fomes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/TriCEM/fomes?branch=main)
 [![Code Coverage](https://github.com/nickbrazeau/fomes/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/nickbrazeau/fomes/actions/workflows/test-coverage.yaml)
+[![Codecov test coverage](https://codecov.io/gh/TriCEM/fomes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/TriCEM/fomes?branch=main)
 <!-- badges: end -->
 
 ## Name 
 
-## Name
-“He [Fracastoro] appears to have first used the Latin word fomes, meaning tinder, in the sense of infectious agent, in his essay on contagion De Contagione et Contagiosis Morbis (On Contagion and Contagious Diseases), published in 1546:[5] "I call fomites [from the Latin fomes, meaning "tinder"] such things as clothes, linen, etc., which although not themselves corrupt, can nevertheless foster the essential seeds of the contagion and thus cause infection."[6] His theory remained influential for nearly three centuries, before being superseded by a fully developed germ theory.
+## Explanation of Name
+`fomes` is a medical Latin word that means "tinder, or fuel" first used by [Girolam Fracastoro](https://en.wikipedia.org/wiki/Girolamo_Fracastoro) to describe inanimate objects that were spreading infectious diseases in the 16th century (preceding germ theory by 300+ years). In many ways, an agent-based stochastic model follows Fracastoro's framework closely, as "essential seeds of the contagion".
 
-- https://en.wikipedia.org/wiki/Girolamo_Fracastoro
+## Goal
+`fomes` is an agent-based stochastic model ...
 
 
-## Goal 
-The goal of fomes is to ...
+## Development
+:warning: This project is under active development. As a result, parameter names and behaviors as well as output file formats may change. Releases will be noted in the "News" with any lack of backwards compatibility indicated by a full [version number change](https://r-pkgs.org/release.html#release-version).  
+<br>
+:bangbang: We welcome contributions and collaboration. We will be following [Github's Community Standards](https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct) and will hold all contributors to this standard by promoting respect for all coding levels and backgrounds.
+:pause_button: We ask that code contributors *read* the [style guidelines]() and [workflow guidelines]() prior to making any contributions.
 
-## Installation
+<br>
+<br>
+## Installation & Use
+Please see the [vignettes](https://TriCEM.github.io/fomes/) for installation and use instructions. Thank you for your interest in our package!
+<br>
 
-You can install the development version of fomes like so:
-
-``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(fomes)
-## basic example code
-```
-
+<p align="center">
+<img src="https://raw.githubusercontent.com/T/TriCEM/main/R_ignore/images/fomes_hexbadge.png" width="450" height="350">
+</p>
