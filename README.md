@@ -29,5 +29,5 @@ Please see the [vignettes](https://TriCEM.github.io/fomes/) for installation and
 <br>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/T/TriCEM/main/R_ignore/images/fomes_hexbadge.png" width="450" height="350">
+<img src="https://raw.githubusercontent.com/TriCEM/main/R_ignore/images/fomes_hexbadge.png" width="450" height="350">
 </p>
