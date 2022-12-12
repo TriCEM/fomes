@@ -18,7 +18,10 @@
 ## Development
 :warning: This project is under active development. As a result, parameter names and behaviors as well as output file formats may change. Releases will be noted in the "News" with any lack of backwards compatibility indicated by a full [version number change](https://r-pkgs.org/release.html#release-version).  
 <br>
-:bangbang: We welcome contributions and collaboration. We will be following [Github's Community Standards](https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct) and will hold all contributors to this standard by promoting respect for all coding levels and backgrounds.
+<br>
+
+:bangbang: We welcome contributions and collaboration. We will be following [Github's Community Standards](https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct) and will hold all contributors to this standard by promoting respect for all coding levels and backgrounds.  
+   
 :pause_button: We ask that code contributors *read* the [style guidelines](https://raw.githubusercontent.com/TriCEM/fomes/main/R_ignore/style_guide.md) and [workflow guidelines](https://raw.githubusercontent.com/TriCEM/fomes/main/R_ignore/worflow_guide.md) prior to making any contributions.
 
 <br>
@@ -29,5 +32,5 @@ Please see the [vignettes](https://TriCEM.github.io/fomes/) for installation and
 <br>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/TriCEM/main/R_ignore/images/fomes_hexbadge.png" width="450" height="350">
+<img src="https://raw.githubusercontent.com/TriCEM/fomes/main/R_ignore/images/fomes_hexbadge.png" width="450" height="350">
 </p>
