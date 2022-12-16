@@ -6,11 +6,9 @@
 # Session Data files
 .RData
 
-# Data files I'm generating
-datasets/
-data/
+# personal files
 sandbox/
-results/
+ignore/
 
 # pkgdown files
 docs
@@ -21,7 +19,6 @@ docs
 # knitr and R markdown default cache directories
 /*_cache/
 /cache/
-*png
 
 # Temporary files created by R markdown
 *.utf8.md
