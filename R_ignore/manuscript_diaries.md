@@ -111,9 +111,9 @@ Idea of overdispersion key at low incidence intersections. Takes very few inter-
 ## Genomics
 ### Software
 #### [Turakhia _et al._ 2021/UShER](https://www.nature.com/articles/s41588-021-00862-7)
-**_TA_**:
+**_TA_**: USHER algorithmm/framework is similar to a segregating sites MSA but uses precomputed data object storing the inferred histories of mutation events/seg sites on the tree (almost like a look up time table). Very fast and scalable to big data  
 
-#### [Turakhia _et al._ 2021/SCOTTI](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5040440/)
+#### [Maio_et al._ 2016/SCOTTI](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5040440/)
 
 **_TA_**: Uses the structured coalescence to overcome issues of within host evolution and non-sampled hosts. Models each host as it's own "deme" and transmission events are migration events between demes. Also brings up several transmission complexities (see figure 1)
 

@@ -6,11 +6,9 @@
 # Session Data files
 .RData
 
-# Data files I'm generating
-datasets/
-data/
+# personal files
 sandbox/
-results/
+ignore/
 
 # pkgdown files
 docs
