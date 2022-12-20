@@ -16,6 +16,15 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/genRandomBetaMat.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sim_Gillespie_SIR.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tidy_traj_out.html</loc>
   </url>
 </urlset>
