@@ -80,10 +80,10 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
 
     if (next_event == "transmission") {
       #Choose infector pop based on transmission rates
-      ind_probs <- colSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
+      ind_probs <- rowSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
       parent_pop <- sample(Inds, size = 1, prob = ind_probs)
 
-      ind_probs <- betaSI[,parent_pop] / sum(betaSI[,parent_pop]) # going across columns
+      ind_probs <- betaSI[parent_pop,] / sum(betaSI[parent_pop,]) # going across columns
       child_pop <- sample(Inds, size = 1, prob = ind_probs)
 
       # population level updates
