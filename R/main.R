@@ -1,15 +1,3 @@
-#' @title Generate Random Beta matrix for Effective ij Contact Rates
-#' @param N integer; population size
-#' @noMd
-#' @export
-
-genRandomBetaMat <- function(N) {
-  ret <- matrix(runif(N^2), ncol = N, nrow = N)
-  diag(ret) <- 0
-  return(ret)
-}
-
-
 #' @title Gillespie Simulation
 #' @param Iseed integer; Number of initial infections in the population
 #' @param N integer; population size
@@ -23,7 +11,7 @@ genRandomBetaMat <- function(N) {
 #' }
 #' @export
 
-sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
+sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
                               beta = genRandomBetaMat(N),
                               dur_I = 1,
                               term_time = 500) {
@@ -31,11 +19,11 @@ sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
   #............................................................
   # assertions
   #...........................................................
-  assert_single_int(Iseed)
-  assert_single_int(N)
-  assert_numeric(dur_I)
-  assert_square_matrix(beta)
-  assert_dim(beta, c(N,N))
+  goodegg::assert_single_int(Iseed)
+  goodegg::assert_single_int(N)
+  goodegg::assert_numeric(dur_I)
+  goodegg::assert_square_matrix(beta)
+  goodegg::assert_dim(beta, c(N,N))
 
   #............................................................
   # initialize and storage
@@ -47,13 +35,13 @@ sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
   R_now <- rep(0, N)
   Inds <- 1:N
   # time keeping
-  i <- 1
+  i <- 2 # i of 1 is our initial conditions and time of 0
   t <- time <- 0.0
 
   # trajectories for score keeping and plotting
-  S_traj <- c()
-  I_traj <- c()
-  R_traj <- c()
+  S_traj <- list(S_now)
+  I_traj <- list(I_now)
+  R_traj <- list(R_now)
 
   #............................................................
   # run simulation based on rates and events
@@ -61,7 +49,7 @@ sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
 
   while (time < term_time) {
 
-    # catch
+    # catch - if no infxns, exit loop
     if (sum(I_now) == 0) {
       break
     }
@@ -98,7 +86,7 @@ sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
       ind_probs <- betaSI[,parent_pop] / sum(betaSI[,parent_pop]) # going across columns
       child_pop <- sample(Inds, size = 1, prob = ind_probs)
 
-      # population level stuff
+      # population level updates
       S_now[child_pop] <- S_now[child_pop] - 1
       I_now[child_pop] <- I_now[child_pop] + 1 # had parent_pop (incorrectly) here for some reason?
 
@@ -107,30 +95,22 @@ sim_Gillespie_SIS <- function(Iseed = 1, N = 1e3,
       ind_probs <- now_dur_I / rate_r
       recoveree_pop <- sample(Inds, 1, p = ind_probs)
 
-      # population level stuff
+      # population level updates
       I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
-      S_now[recoveree_pop] <- S_now[recoveree_pop] + 1
+      R_now[recoveree_pop] <- R_now[recoveree_pop] + 1
     }
 
     # Update lists and time vec
     t <- c(t, time)
-    S_traj[[i]] <- S_now
-    I_traj[[i]] <- I_now
-    R_traj[[i]] <- R_now[p]
+    S_traj <- append(S_traj, list(S_now))
+    I_traj <- append(I_traj, list(I_now))
+    R_traj <- append(R_traj, list(R_now))
     # update counter
     i <- i+ 1
 
   }
-  #......................
-  # out
-  #......................
-  tidy_traj_out <- function(x) {
-    ret <- t(do.call("cbind", (lapply(x, as.data.frame))))
-    rownames(ret) <- NULL
-    colnames(ret) <- as.character(1:ncol(ret))
-    return(as.data.frame(ret))
-  }
 
+  # out
   out <- list(
     S_traj = tidy_traj_out(S_traj),
     I_traj = tidy_traj_out(I_traj),

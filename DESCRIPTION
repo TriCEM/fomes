@@ -13,6 +13,8 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp
+Remotes:
+    nickbrazeau/goodegg,
 Suggests: 
     covr,
     testthat (>= 3.0.0)
