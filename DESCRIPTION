@@ -13,7 +13,8 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp,
-    goodegg
+    goodegg,
+    igraph
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 

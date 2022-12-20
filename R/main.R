@@ -1,9 +1,11 @@
 #' @title Gillespie Simulation
 #' @param Iseed integer; Number of initial infections in the population
 #' @param N integer; population size
-#' @param beta numeric vector; Effective contact rate for S_i I_j elements
+#' @param beta numeric vector; Probability of transmission given contact for S_i I_j elements
 #' @param dur_I numeric; Duration of infection
 #' @param term_time numeric; time termination condition
+#' @param rho numeric; network rewiring probability
+#' @param initNC integer; neighborhood size as defined by \link{igraph::neighborhood.size}
 #' @description
 #' Assuming:
 #' \itemize{
@@ -11,9 +13,11 @@
 #' }
 #' @export
 
-sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
-                              beta = genRandomBetaMat(N),
+sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
+                              beta = matrix(1, 10, 10),
                               dur_I = 1,
+                              rho = 0.5,
+                              initNC = 5,
                               term_time = 500) {
 
   #............................................................
@@ -37,6 +41,9 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
   # time keeping
   i <- 2 # i of 1 is our initial conditions and time of 0
   t <- time <- 0.0
+  # initial contacts
+  conn <- genRandomNetworkConnections(N = N, initNC = initNC, rho = rho)
+
 
   # trajectories for score keeping and plotting
   S_traj <- list(S_now)
@@ -55,7 +62,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
     }
 
     # transmission rates
-    betaSI <- beta * outer(S_now, I_now) # betaSI has elements beta_i,j * S_j * I_i
+    betaSI <- beta * outer(S_now, I_now) * conn # betaSI has elements beta_i,j * S_j * I_i * connections
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates
@@ -79,11 +86,12 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
     time <- time + event[[next_event]]
 
     if (next_event == "transmission") {
-      #Choose infector pop based on transmission rates
+      #Choose infector node based on transmission rates
       ind_probs <- colSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
       parent_pop <- sample(Inds, size = 1, prob = ind_probs)
 
-      ind_probs <- betaSI[,parent_pop] / sum(betaSI[,parent_pop]) # going across columns
+      #Choose susceptible based on
+      ind_probs <- betaSI[,parent_pop] / sum(betaSI[,parent_pop])
       child_pop <- sample(Inds, size = 1, prob = ind_probs)
 
       # population level updates
@@ -107,6 +115,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
     R_traj <- append(R_traj, list(R_now))
     # update counter
     i <- i+ 1
+    # update connections
+    conn <- updateNetworkConnections(adjmat = conn, rho = rho)
 
   }
 
