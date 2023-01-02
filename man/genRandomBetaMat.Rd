@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{genRandomBetaMat}
 \alias{genRandomBetaMat}
-\title{Generate Random Beta matrix for Effective ij Contact Rates}
+\title{Generate Random Beta matrix}
 \usage{
 genRandomBetaMat(N)
 }
@@ -10,5 +10,5 @@ genRandomBetaMat(N)
 \item{N}{integer; population size}
 }
 \description{
-Generate Random Beta matrix for Effective ij Contact Rates
+Generate Random Beta matrix
 }

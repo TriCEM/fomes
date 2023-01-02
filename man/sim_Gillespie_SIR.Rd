@@ -6,9 +6,11 @@
 \usage{
 sim_Gillespie_SIR(
   Iseed = 1,
-  N = 1000,
-  beta = genRandomBetaMat(N),
+  N = 10,
+  beta = matrix(1, 10, 10),
   dur_I = 1,
+  rho = 0.5,
+  initNC = 5,
   term_time = 500
 )
 }
@@ -17,9 +19,13 @@ sim_Gillespie_SIR(
 
 \item{N}{integer; population size}
 
-\item{beta}{numeric vector; Effective contact rate for S_i I_j elements}
+\item{beta}{numeric vector; Probability of transmission given contact for S_i I_j elements}
 
 \item{dur_I}{numeric; Duration of infection}
+
+\item{rho}{numeric; network rewiring probability}
+
+\item{initNC}{integer; neighborhood size as defined by \link{igraph::neighborhood.size}}
 
 \item{term_time}{numeric; time termination condition}
 }

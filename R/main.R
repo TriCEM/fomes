@@ -96,7 +96,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
 
       # population level updates
       S_now[child_pop] <- S_now[child_pop] - 1
-      I_now[child_pop] <- I_now[child_pop] + 1 # had parent_pop (incorrectly) here for some reason?
+      I_now[child_pop] <- I_now[child_pop] + 1
 
     } else if (next_event == "recovery") { # If recovery occurs first
       # Choose recovery pop based on recovery rates
@@ -114,7 +114,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     I_traj <- append(I_traj, list(I_now))
     R_traj <- append(R_traj, list(R_now))
     # update counter
-    i <- i+ 1
+    i <- i + 1
     # update connections
     conn <- updateNetworkConnections(adjmat = conn, rho = rho)
 
