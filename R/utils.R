@@ -13,25 +13,30 @@ updateNetworkConnections <- function(adjmat = NULL, rho = 0.5) {
   adjmat_new <- adjmat
 
   # in order to preserve symmetry, will work with just the upper (and lower triangle)
-
-  for(i in 1:(niters-1)) {  # upper triangle
+  for(i in 1:(niters-1)) {
     for (j in (i+1):niters) {
       r <- runif(1) # generate random prob
 
-      # establishing new connection
       if (r < prho & adjmat[i,j] == 0) {
+        # establish this new connection (do this first in case no connections exist, which we will undo in next few lines)
         adjmat_new[i,j] <- 1
-      }
+        adjmat_new[j,i] <- 1
+        # dissolve an old connection
+        dissolve <- sample(which(adjmat_new[i,] == 1), 1)
+        adjmat_new[dissolve,j] <- 0
+        adjmat_new[j,dissolve] <- 0
 
-      # dissolving old connection
-      if (r < (1 - prho) & adjmat[i,j] == 1) {
+      } else if (r < prho & adjmat[i,j] == 1) {
+        # establish this new connection
         adjmat_new[i,j] <- 0
+        adjmat_new[j,i] <- 0
+        # dissolve an old connection
+        dissolve <- sample(which(adjmat_new[i,] == 0), 1)
+        adjmat_new[dissolve,j] <- 1
+        adjmat_new[j,dissolve] <- 1
       }
-
     }
   } # end ij for upper
-  # now make symmetric
-  adjmat_new[lower.tri(adjmat_new)] <- t(adjmat_new)[lower.tri(adjmat_new)]
 
   # out
   return(adjmat_new)
