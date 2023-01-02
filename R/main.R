@@ -87,11 +87,11 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
 
     if (next_event == "transmission") {
       #Choose infector node based on transmission rates
-      ind_probs <- colSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
+      ind_probs <- rowSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
       parent_pop <- sample(Inds, size = 1, prob = ind_probs)
 
       #Choose susceptible based on
-      ind_probs <- betaSI[,parent_pop] / sum(betaSI[,parent_pop])
+      ind_probs <- betaSI[parent_pop,] / sum(betaSI[parent_pop,])
       child_pop <- sample(Inds, size = 1, prob = ind_probs)
 
       # population level updates

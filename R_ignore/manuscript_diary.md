@@ -110,11 +110,11 @@ Idea of overdispersion key at low incidence intersections. Takes very few inter-
 
 #### [Volz & Meyer 2007](https://pubmed.ncbi.nlm.nih.gov/17878137/)
 
-**_TA_**: Neighbor exchnage model for including dynamicism into contact networks. 
+**_TA_**: Neighbor exchange model for including dynamicism into contact networks. 
 
 #### [Volz 2008](https://link.springer.com/article/10.1007/s00285-007-0116-4)
 
-**_TA_**: Neighbor exchnage model for including dynamicism into contact networks. 
+**_TA_**: ... 
 
 
 
