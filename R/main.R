@@ -55,7 +55,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 1e3,
     }
 
     # transmission rates
-    betaSI <- beta * outer(S_now, I_now) # betaSI has elements beta_i,j * S_j * I_i
+    betaSI <- beta * outer(I_now, S_now) # betaSI has elements beta_i,j * S_j * I_i
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates
