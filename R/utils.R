@@ -12,59 +12,28 @@ updateNetworkConnections <- function(adjmat = NULL, rho = 0.5) {
   niters <- nrow(adjmat)
   adjmat_new <- adjmat
 
-  # in order to preserve symmetry, will work with just the upper or lower triangle
-  # toggle upper or lower for balance of edge densities
-  #......................
-  # upper triangle
-  #......................
-  if (rbinom(1, 1, 0.5)) {
+  # in order to preserve symmetry, will work with just the upper (and lower triangle)
 
-    for(i in 1:(niters-1)) {
-      for (j in (i+1):niters) {
-        r <- runif(1) # generate random prob
+  for(i in 1:(niters-1)) {  # upper triangle
+    for (j in (i+1):niters) {
+      r <- runif(1) # generate random prob
 
-        # establishing new connection
-        if (r < prho & adjmat[i,j] == 0) {
-          adjmat_new[i,j] <- 1
-        }
-
-        # dissolving old connection
-        if (r < (1 - prho) & adjmat[i,j] == 1) {
-          adjmat_new[i,j] <- 0
-        }
-
+      # establishing new connection
+      if (r < prho & adjmat[i,j] == 0) {
+        adjmat_new[i,j] <- 1
       }
-    } # end ij for upper
-    # now make symmetric
-    adjmat_new[lower.tri(adjmat_new)] <- t(adjmat_new)[lower.tri(adjmat_new)]
 
-    #......................
-    # lower triangle
-    #......................
-  } else {
-    for(i in niters:2) {
-      for (j in (i-1):1) {
-        r <- runif(1) # generate random prob
-
-        # establishing new connection
-        if (r < prho & adjmat[i,j] == 0) {
-          adjmat_new[i,j] <- 1
-        }
-
-        # dissolving old connection
-        if (r < (1 - prho) & adjmat[i,j] == 1) {
-          adjmat_new[i,j] <- 0
-        }
-
+      # dissolving old connection
+      if (r < (1 - prho) & adjmat[i,j] == 1) {
+        adjmat_new[i,j] <- 0
       }
-    } # end ij for lower triangle
-    # now make symmetric
-    adjmat_new[upper.tri(adjmat_new)] <- t(adjmat_new)[upper.tri(adjmat_new)]
-  }
 
-  #......................
+    }
+  } # end ij for upper
+  # now make symmetric
+  adjmat_new[lower.tri(adjmat_new)] <- t(adjmat_new)[lower.tri(adjmat_new)]
+
   # out
-  #......................
   return(adjmat_new)
 }
 
