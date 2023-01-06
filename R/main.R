@@ -63,20 +63,21 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
 
     # transmission rates
     betaSI <- beta * outer(I_now, S_now) * conn # betaSI has elements beta_i,j * S_j * I_i * connections
+    # density dependent
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates
-    now_dur_I = dur_I * I_now
+    now_dur_I <- (1/dur_I) * I_now
     rate_r <- sum(now_dur_I)
 
     # Calculate time until each of the events occurs
     event <- c("transmission" = Inf,
                 "recovery" = Inf)
     if (rate_t > 0) {
-      event[["transmission"]] <- rexp(1, 1 / rate_t)
+      event[["transmission"]] <- rexp(1, rate_t)
     }
     if (rate_r > 0) {
-      event[["recovery"]] <- rexp(1, 1 / rate_r)
+      event[["recovery"]] <- rexp(1, rate_r)
     }
 
     # Get the event that will occur first, and the time that will take
