@@ -29,7 +29,7 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   #...........................................................
   # vector inits
   I_traj <- I_now <- Iseed
-  S_traj <- S_now <- 1 - Iseed
+  S_traj <- S_now <- N - Iseed
   R_traj <- R_now <- 0
   Inds <- 1:N
   # time keeping
@@ -48,7 +48,7 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-    rate_t <- (beta/N) * I_now * S_now
+    rate_t <- beta * I_now * S_now    # density dependent
     # recovery rates
     rate_r <- (1/dur_I) * I_now
 
@@ -91,9 +91,9 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   # out
   out <- data.frame(
     time = t,
-    Susc = S_traj,
-    Infxn = I_traj,
-    Recov = R_traj
+    numSusc = S_traj,
+    numInfxn = I_traj,
+    numRecov = R_traj
   )
   return(out)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{updateNetworkConnections}
 \alias{updateNetworkConnections}
-\title{Update  Network Connections}
+\title{Update Network Connections}
 \usage{
 updateNetworkConnections(adjmat = NULL, rho = 0.5)
 }
@@ -12,5 +12,5 @@ updateNetworkConnections(adjmat = NULL, rho = 0.5)
 \item{rho}{numeric; network rewiring probability}
 }
 \description{
-Update  Network Connections
+Update Network Connections
 }

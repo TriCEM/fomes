@@ -3,6 +3,7 @@
 export(genRandomBetaMat)
 export(genRandomNetworkConnections)
 export(sim_Gillespie_SIR)
+export(tidy_sim_Gillespie_SIR)
 export(tidy_traj_out)
 export(tradsim_Gillespie_SIR)
 export(updateNetworkConnections)
