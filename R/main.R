@@ -79,6 +79,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     if (rate_r > 0) {
       event[["recovery"]] <- rexp(1, rate_r)
     }
+    #TODO event type for rewiring
 
     # Get the event that will occur first, and the time that will take
     next_event <- names(event)[which(event == min(event))]
