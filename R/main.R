@@ -4,8 +4,7 @@
 #' @param beta numeric vector; Probability of transmission given contact for S_i I_j elements
 #' @param dur_I numeric; Duration of infection
 #' @param term_time numeric; time termination condition
-#' @param rho numeric; network rewiring probability
-#' @param initNC integer; neighborhood size as defined by \link{igraph::neighborhood.size}
+#' @param rho numeric; network rewiring rate
 #' @description
 #' Assuming:
 #' \itemize{
@@ -16,8 +15,7 @@
 sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
                               beta = matrix(1, 10, 10),
                               dur_I = 1,
-                              rho = 0.5,
-                              initNC = 5,
+                              rho = 0.05,
                               term_time = 500) {
 
   #............................................................
@@ -38,17 +36,19 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   S_now <- 1 - I_now
   R_now <- rep(0, N)
   Inds <- 1:N
+
+
   # time keeping
   i <- 2 # i of 1 is our initial conditions and time of 0
   t <- time <- 0.0
-  # initial contacts
-  conn <- genRandomNetworkConnections(N = N, initNC = initNC, rho = rho)
-
 
   # trajectories for score keeping and plotting
   S_traj <- list(S_now)
   I_traj <- list(I_now)
   R_traj <- list(R_now)
+
+  # initial contact matrix
+  conn <- genInitialConnections(N, rho)
 
   #............................................................
   # run simulation based on rates and events
@@ -71,15 +71,18 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     rate_r <- sum(now_dur_I)
 
     # Calculate time until each of the events occurs
-    event <- c("transmission" = Inf,
+    event <- c("rewire" = Inf,
+               "transmission" = Inf,
                 "recovery" = Inf)
+    if (rate_t > 0) {
+      event[["rewire"]] <- rexp(1, rho)
+    }
     if (rate_t > 0) {
       event[["transmission"]] <- rexp(1, rate_t)
     }
     if (rate_r > 0) {
       event[["recovery"]] <- rexp(1, rate_r)
     }
-    #TODO event type for rewiring
 
     # Get the event that will occur first, and the time that will take
     next_event <- names(event)[which(event == min(event))]
@@ -87,7 +90,11 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     # Jump to that time
     time <- time + event[[next_event]]
 
-    if (next_event == "transmission") {
+    # make change for earliest event
+    if (next_event == "rewire") {
+      # rewire a pair of nodes
+      conn <- rewireNEnodes(adjmat = conn, N = N)
+    } else if (next_event == "transmission") {
       # Choose infector node based on transmission rates
       ind_probs <- rowSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
       parent_pop <- sample(Inds, size = 1, prob = ind_probs)
@@ -117,9 +124,6 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     R_traj <- append(R_traj, list(R_now))
     # update counter
     i <- i + 1
-    # update connections
-    conn <- updateNetworkConnections(adjmat = conn, rho = rho)
-
   }
 
   # out

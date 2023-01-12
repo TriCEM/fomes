@@ -15,48 +15,60 @@ tidy_sim_Gillespie_SIR <- function(simout) {
 
 
 
-#' @title Update Network Connections
+
+
+#' @title Update Adjacency Matrix Connections
 #' @inheritParams sim_Gillespie_SIR
-#' @param adjmat matrix; adjacency matrix from network of connections
+#' @details Will sample a single pair of connections
 #' @noMd
 #' @export
-updateNetworkConnections <- function(adjmat = NULL, rho = 0.5) {
-  prho <- 1 - exp(-rho) # rate to prob
+updateNetworkConnections <- function(adjmat = NULL, N) {
   #............................................................
-  # rewiring probability
+  # rewiring structure by randomly sampling two nodes with connection (arc)
   #   NB edge density does not change per node; just arcs between nodes
   #...........................................................
-  niters <- nrow(adjmat)
-  adjmat_new <- adjmat
+  ctch <- TRUE # init catch for proper node selection
+  while (ctch) {
+    currconn <- which(adjmat == 1)
+    # sample two current connections
+    currconn_s <- sample(currconn, size = 2, replace = F)
+    currconn_i <- ceiling(currconn_s/N) # get i
+    currconn_j <- currconn_s %% N # get j
+    ab <- c(currconn_i[1], currconn_j[1])
+    cd <- c(currconn_i[2], currconn_j[2])
 
-  # in order to preserve symmetry, will work with just the upper (and lower triangle)
-  for(i in 1:(niters-1)) {
-    for (j in (i+1):niters) {
-      r <- runif(1) # generate random prob
+    # catch for diagonal or same connection on opposite sides of triangle (lower vs upper)
+    ctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1 | paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
+  }
 
-      if (r < prho & adjmat[i,j] == 0) {
-        # establish this new connection (do this first in case no connections exist, which we will undo in next few lines)
-        adjmat_new[i,j] <- 1
-        adjmat_new[j,i] <- 1
-        # dissolve an old connection
-        dissolve <- sample(which(adjmat_new[i,] == 1), 1)
-        adjmat_new[dissolve,j] <- 0
-        adjmat_new[j,dissolve] <- 0
+  # erase prior connections
+  adjmat[ab[1], ab[2]] <- 0
+  adjmat[ab[2], ab[1]] <- 0
+  adjmat[cd[1], cd[2]] <- 0
+  adjmat[cd[2], cd[1]] <- 0
 
-      } else if (r < prho & adjmat[i,j] == 1) {
-        # establish this new connection
-        adjmat_new[i,j] <- 0
-        adjmat_new[j,i] <- 0
-        # dissolve an old connection
-        dissolve <- sample(which(adjmat_new[i,] == 0), 1)
-        adjmat_new[dissolve,j] <- 1
-        adjmat_new[j,dissolve] <- 1
-      }
-    }
-  } # end ij for upper
+  # identify new connections
+  ctch <- TRUE # init catch for ensuring non-redundant connections
+  while (ctch) {
+  newconn_index <- sample(1:4, size = 4, replace = F)
+  abnew <- c(ab,cd)[ c(newconn_index[1:2]) ] # new arc 1
+  cdnew <- c(ab,cd)[ c(newconn_index[3:4]) ] # new arc 2
+
+  # catch if there is already a connection there avoiding redundancy and loss of consistent edge density
+  # NB this will allow for original connections to reform
+  ctch <- adjmat[abnew[1], abnew[2]] == 1 | adjmat[cdnew[1], cdnew[2]] == 1
+
+  }
+
+  # make new connections
+  adjmat[abnew[1], abnew[2]] <- 1
+  adjmat[abnew[2], abnew[1]] <- 1
+  adjmat[cdnew[1], cdnew[2]] <- 1
+  adjmat[cdnew[2], cdnew[1]] <- 1
+
 
   # out
-  return(adjmat_new)
+  return(adjmat)
 }
 
 
@@ -64,24 +76,37 @@ updateNetworkConnections <- function(adjmat = NULL, rho = 0.5) {
 
 
 
-#' @title Generate Random Network for Connections
+#' @title Initialize Adjacency Matrix Connections
 #' @inheritParams sim_Gillespie_SIR
 #' @noMd
 #' @export
+genInitialConnections <- function(N, rho) {
 
-genRandomNetworkConnections <- function(N, rho, initNC) {
+  # initial contacts, assume a binomial prob dist
+  initedgedens <- round( N * (1 - exp(-rho)) ) # round to nearest whole number for edge
 
-  prho <- 1 - exp(-rho) # rate to prob
-  net <- igraph::watts.strogatz.game(dim = 1,
-                                     size = N,
-                                     nei = initNC,
-                                     p = prho)
+  #......................
+  # greedy approach to make initial adjacency matrix
+  #......................
+  conn <- matrix(0, N, N)
 
-  adjmat <- igraph::as_adjacency_matrix(net,
-                                        sparse = FALSE) # sparse here is type of
-  # isSymmetric(adjmat) - is symmetric by default
+  for(i in 1:(N-1)) { # for each node
+    for (j in (i+1):N) { # in the upper triangle
+      newconns <- 1:N
+      newconns <- newconns[i != 1:N] # no selves
+      while (sum(conn[i,]) < initedgedens) { # until we have init edge density
+        j <- sample(newconns, 1) # sample a connection
+        if (sum(conn[,j]) < initedgedens) { # look ahead to make sure new node is not saturated
+          conn[i,j] <- 1
+          conn[j,i] <- 1
+        }
+      }
+    }
+  }
 
-  return(adjmat)
+  # isSymmetric(conn) # must be true
+  # out
+  return(conn)
 }
 
 

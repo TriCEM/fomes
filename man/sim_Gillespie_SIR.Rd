@@ -9,8 +9,7 @@ sim_Gillespie_SIR(
   N = 10,
   beta = matrix(1, 10, 10),
   dur_I = 1,
-  rho = 0.5,
-  initNC = 5,
+  rho = 0.05,
   term_time = 500
 )
 }
@@ -23,9 +22,7 @@ sim_Gillespie_SIR(
 
 \item{dur_I}{numeric; Duration of infection}
 
-\item{rho}{numeric; network rewiring probability}
-
-\item{initNC}{integer; neighborhood size as defined by \link{igraph::neighborhood.size}}
+\item{rho}{numeric; network rewiring rate}
 
 \item{term_time}{numeric; time termination condition}
 }

@@ -2,15 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{updateNetworkConnections}
 \alias{updateNetworkConnections}
-\title{Update Network Connections}
+\title{Update Adjacency Matrix Connections}
 \usage{
-updateNetworkConnections(adjmat = NULL, rho = 0.5)
+updateNetworkConnections(adjmat = NULL, N)
 }
 \arguments{
-\item{adjmat}{matrix; adjacency matrix from network of connections}
-
-\item{rho}{numeric; network rewiring probability}
+\item{N}{integer; population size}
 }
 \description{
-Update Network Connections
+Update Adjacency Matrix Connections
+}
+\details{
+Will sample a single pair of connections
 }
