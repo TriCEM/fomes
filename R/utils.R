@@ -89,23 +89,35 @@ genInitialConnections <- function(initNC, N) {
   #......................
   # greedy approach to make initial adjacency matrix
   #......................
-  conn <- matrix(0, N, N)
-
-  for(i in 1:N) { # for each node
-    newconns <- 1:N
-    newconns <- newconns[i != 1:N] # no selves
-    while (sum(conn[i,]) < initNC) { # until we have init edge density
-      j <- sample(newconns, 1) # sample a connection
-      if (sum(conn[,j]) < initNC) { # look ahead to make sure new node is not saturated
-        conn[i,j] <- 1
-        conn[j,i] <- 1
+  greedy_contactmat_generator <- function(conn) {
+    for(i in 1:N) { # for each node
+      while (sum(conn[i,]) < initNC) { # until we have init edge density
+        newconns <- which(colSums(conn) != initNC)
+        newconns <- newconns[newconns != i]
+        if (length(newconns) == 0) { # all connections saturated
+          break
+        } else {
+          j <- sample(newconns, 1) # sample a connection
+          if (sum(conn[,j]) < initNC) { # look ahead to make sure new node is not saturated (since the check is outside while)
+            conn[i,j] <- 1
+            conn[j,i] <- 1
+          }
+        }
       }
-    }
+    } # end for loop
+    return(conn)
+  }
+  #......................
+  # run function
+  #......................
+  contactmat <- matrix(0, N, N)
+  while(all(rowSums(contactmat) != initNC)) { # recursively doing this for transitivity issue leading to early saturation w/out all nodes having equal edge density
+    contactmat <- greedy_contactmat_generator(conn = contactmat)
   }
 
   # isSymmetric(conn) # must be true
   # out
-  return(conn)
+  return(contactmat)
 }
 
 
