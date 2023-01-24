@@ -4,12 +4,10 @@
 \alias{genInitialConnections}
 \title{Initialize Adjacency Matrix Connections}
 \usage{
-genInitialConnections(N, rho)
+genInitialConnections(initNC, N)
 }
 \arguments{
 \item{N}{integer; population size}
-
-\item{rho}{numeric; network rewiring rate}
 }
 \description{
 Initialize Adjacency Matrix Connections
