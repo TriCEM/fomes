@@ -11,18 +11,45 @@ test_that("Contact Mat Rewiring is less than or equal to rewiring events", {
     testthat::expect_lte(unique_contact_mat, rewire_count)
 })
 
+test_that("Initial Network has Consistent Edge Density", {
+  initNCit <- 3 # edge density that should be cannon
+  firstmat_edge_den <- list()
+  # iter it out
+  for (i in 1:10) {
+    out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+                             beta = rep(0.8, 10),
+                             dur_I = 5,
+                             rho = 100, # high rewiring rate
+                             initNC = initNCit,
+                             term_time = 50,
+                             return_contact_matrices = T)
+    firstmat_edge_den <- append(firstmat_edge_den, out$contact_store[1])
+  }
 
-test_that("Consistent Edge Density", {
-  initNCit <- 3
-  out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
-                           beta = rep(0.8, 10),
-                           dur_I = 5,
-                           rho = 100, # high rewiring rate
-                           initNC = initNCit,
-                           term_time = 50,
-                           return_contact_matrices = T)
+  firstedden <- unique(unlist(lapply(firstmat_edge_den, rowSums)))
+  testthat::expect_length(firstedden, 1)
+  testthat::expect_equal(firstedden, initNCit)
+})
 
-  edden <- unique(unlist(lapply(out$contact_store, rowSums)))
+
+
+
+test_that("Rewiring Networks have Consistent Edge Density", {
+  initNCit <- 3 # edge density that should be cannon
+  edge_den <- list()
+  # iter it out
+  for (i in 1:100) {
+    out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+                             beta = rep(0.8, 10),
+                             dur_I = 5,
+                             rho = 100, # high rewiring rate
+                             initNC = initNCit,
+                             term_time = 50,
+                             return_contact_matrices = T)
+    edge_den <- append(edge_den, unique(out$contact_store))
+  }
+
+  edden <- unique(unlist(lapply(edge_den, rowSums)))
   testthat::expect_length(edden, 1)
   testthat::expect_equal(edden, initNCit)
 })
