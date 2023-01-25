@@ -12,8 +12,10 @@ RoxygenNote: 7.2.1
 LinkingTo: 
     Rcpp
 Imports: 
+    stats,
     Rcpp,
-    goodegg
+    goodegg,
+    igraph
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 

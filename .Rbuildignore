@@ -8,3 +8,5 @@
 ^codecov\.yml$
 ^\.covrignore$
 ^sandbox$
+^R_ignore$
+^my_ignore$
