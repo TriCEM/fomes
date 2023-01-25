@@ -14,6 +14,29 @@ tidy_sim_Gillespie_SIR <- function(simout) {
 }
 
 
+#' @title Initialize Adjacency Matrix Connections
+#' @inheritParams sim_Gillespie_SIR
+#' @noMd
+#' @export
+genInitialConnections <- function(initNC, N) {
+
+  # initial contacts, assume a binomial prob dist
+  #initedgedens <- ceiling( N * (1 - exp(-rho)) ) # round to nearest whole number for edge (ceiling so always at least 1)
+  #initedgedens <- initNC
+
+  #............................................................
+  # using igraph as workhorse here
+  #...........................................................
+  net <- igraph::degree.sequence.game(rep(initNC, N), method = "vl")
+  contactmat <- igraph::as_adjacency_matrix(net,
+                                            type = "both",
+                                            names = FALSE,
+                                            sparse = FALSE)
+  # isSymmetric(conn) # must be true
+  # out
+  return(contactmat)
+}
+
 
 
 
@@ -40,7 +63,7 @@ rewireNEnodes <- function(adjmat = NULL, N) {
     #......................
     # catches
     #......................
-    # can't be a diagonal
+    # can't be a diagonal (granted diagonals are coded as 0s so this is to protect any future changes)
     diagctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1
     # can't be on opposite sides of the triangle
     trigctch <- paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
@@ -78,51 +101,6 @@ rewireNEnodes <- function(adjmat = NULL, N) {
   # out
   return(adjmat)
 }
-
-
-
-
-
-
-#' @title Initialize Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_SIR
-#' @noMd
-#' @export
-genInitialConnections <- function(initNC, N) {
-
-  # initial contacts, assume a binomial prob dist
-  #initedgedens <- ceiling( N * (1 - exp(-rho)) ) # round to nearest whole number for edge (ceiling so always at least 1)
-  #initedgedens <- initNC
-
-  #......................
-  # greedy function to make initial adjacency matrix
-  #......................
-  greedy_contactmat_generator <- function(conn, initNC) {
-    for(i in 1:N) { # for each node
-      while (sum(conn[i,]) < initNC) { # until we have init edge density
-        newconns <- which(colSums(conn) != initNC) # these nodes are saturated, so pick ones that aren't
-        newconns <- newconns[newconns != i] # can't be self
-        if (length(newconns) == 0) { # all connections saturated
-          break
-        } else {
-          j <- sample(newconns, 1) # sample a connection
-          conn[i,j] <- 1
-          conn[j,i] <- 1
-        }
-      }
-    } # end for loop
-    return(conn)
-  }
-
-  # run
-  contactmat <- greedy_contactmat_generator(conn =  matrix(0, N, N),
-                                            initNC = initNC)
-
-  # isSymmetric(conn) # must be true
-  # out
-  return(contactmat)
-}
-
 
 
 #' @title Bind SIR trajectories
