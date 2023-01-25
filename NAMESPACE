@@ -3,8 +3,6 @@
 export(genInitialConnections)
 export(rewireNEnodes)
 export(sim_Gillespie_SIR)
-export(tidy_sim_Gillespie_SIR)
 export(tidy_traj_out)
-export(tradsim_Gillespie_SIR)
 importFrom(Rcpp,sourceCpp)
 useDynLib(fomes, .registration = TRUE)

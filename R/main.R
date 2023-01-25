@@ -8,7 +8,7 @@
 #' The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
 #' and have the same edge density, number of connections, for each node, or individual.
 #' Default value of NULL results in internal function generating intial contact matrix.
-#' @param initi NC integer; initial connections; NB only used if an initial matrix is not provided
+#' @param initNC NC integer; initial connections; NB only used if an initial matrix is not provided
 #' @param rho numeric; network rewiring rate
 #' @param return_contact_matrices boolean; Option to return contact matrices throughout dynamic iterations.
 #' Warning, this can be memory intensive.
@@ -113,13 +113,13 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
                "transmission" = Inf,
                "recovery" = Inf)
     if (rate_t > 0) {
-      event[["rewire"]] <- rexp(1, rho)
+      event[["rewire"]] <- stats::rexp(1, rho)
     }
     if (rate_t > 0) {
-      event[["transmission"]] <- rexp(1, rate_t)
+      event[["transmission"]] <- stats::rexp(1, rate_t)
     }
     if (rate_r > 0) {
-      event[["recovery"]] <- rexp(1, rate_r)
+      event[["recovery"]] <- stats::rexp(1, rate_r)
     }
 
     # Get the event that will occur first, and the time that will take
@@ -148,7 +148,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     } else if (next_event == "recovery") { # If recovery occurs first
       # Choose recovery pop based on recovery rates
       ind_probs <- now_dur_I / rate_r
-      recoveree_pop <- sample(Inds, 1, p = ind_probs)
+      recoveree_pop <- sample(Inds, 1, prob = ind_probs)
 
       # population level updates
       I_now[recoveree_pop] <- I_now[recoveree_pop] - 1

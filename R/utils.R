@@ -1,18 +1,3 @@
-#' @title Tidy out the sim_Gillespie_SIR Model
-#' @inheritParams sim_Gillespie_SIR
-#' @noMd
-#' @export
-#TODO overload this once determine class type - see github issue #5
-tidy_sim_Gillespie_SIR <- function(simout) {
-  out <- data.frame(
-    time = simout$time,
-    numSusc = rowSums(simout$S_traj),
-    numInfxn = rowSums(simout$I_traj),
-    numRecov = rowSums(simout$R_traj)
-  )
-  return(out)
-}
-
 
 #' @title Initialize Adjacency Matrix Connections
 #' @inheritParams sim_Gillespie_SIR
@@ -42,6 +27,7 @@ genInitialConnections <- function(initNC, N) {
 
 #' @title Update Adjacency Matrix Connections
 #' @inheritParams sim_Gillespie_SIR
+#' @param adjmat sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model
 #' @details Will sample a single pair of connections
 #' @noMd
 #' @export

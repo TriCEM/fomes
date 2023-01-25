@@ -32,12 +32,12 @@ Default value of NULL results in internal function generating intial contact mat
 
 \item{rho}{numeric; network rewiring rate}
 
+\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided}
+
 \item{term_time}{numeric; time termination condition}
 
 \item{return_contact_matrices}{boolean; Option to return contact matrices throughout dynamic iterations.
 Warning, this can be memory intensive.}
-
-\item{initi}{NC integer; initial connections; NB only used if an initial matrix is not provided}
 }
 \value{
 The return:

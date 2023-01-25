@@ -7,6 +7,8 @@
 rewireNEnodes(adjmat = NULL, N)
 }
 \arguments{
+\item{adjmat}{sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model}
+
 \item{N}{integer; population size}
 }
 \description{

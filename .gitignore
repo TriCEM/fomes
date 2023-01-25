@@ -8,7 +8,7 @@
 
 # personal files
 sandbox/
-ignore/
+my_ignore/
 
 # pkgdown files
 docs
