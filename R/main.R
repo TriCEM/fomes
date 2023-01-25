@@ -44,6 +44,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   #............................................................
   # initial contact adjacency matrix
   #...........................................................
+  goodegg::assert_single_numeric(rho)
+  goodegg::assert_gr(rho, 0)
   if (!is.null(init_contact_mat)) {
     # user input initial contact matrix
     goodegg::assert_square_matrix(init_contact_mat)
