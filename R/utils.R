@@ -22,7 +22,7 @@ tidy_sim_Gillespie_SIR <- function(simout) {
 #' @details Will sample a single pair of connections
 #' @noMd
 #' @export
-updateNetworkConnections <- function(adjmat = NULL, N) {
+rewireNEnodes <- function(adjmat = NULL, N) {
   #............................................................
   # rewiring structure by randomly sampling two nodes with connection (arc)
   #   NB edge density does not change per node; just arcs between nodes
@@ -32,13 +32,21 @@ updateNetworkConnections <- function(adjmat = NULL, N) {
     currconn <- which(adjmat == 1)
     # sample two current connections
     currconn_s <- sample(currconn, size = 2, replace = F)
-    currconn_i <- ceiling(currconn_s/N) # get i
-    currconn_j <- currconn_s %% N # get j
+    currconn_i <- currconn_s %% N # get i
+    currconn_i[currconn_i == 0] <- N # no remainder means last row
+    currconn_j <- ceiling(currconn_s/N) # get j
     ab <- c(currconn_i[1], currconn_j[1])
     cd <- c(currconn_i[2], currconn_j[2])
-
-    # catch for diagonal or same connection on opposite sides of triangle (lower vs upper)
-    ctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1 | paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
+    #......................
+    # catches
+    #......................
+    # can't be a diagonal
+    diagctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1
+    # can't be on opposite sides of the triangle
+    trigctch <- paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
+    # can't share nodes between pairs
+    ndctch <- length(unique(c(ab, cd))) == 4
+    ctch <- any(c(diagctch, trigctch, ndctch))
   }
 
   # erase prior connections
@@ -50,13 +58,13 @@ updateNetworkConnections <- function(adjmat = NULL, N) {
   # identify new connections
   ctch <- TRUE # init catch for ensuring non-redundant connections
   while (ctch) {
-  newconn_index <- sample(1:4, size = 4, replace = F)
-  abnew <- c(ab,cd)[ c(newconn_index[1:2]) ] # new arc 1
-  cdnew <- c(ab,cd)[ c(newconn_index[3:4]) ] # new arc 2
+    newconn_index <- sample(1:4, size = 4, replace = F)
+    abnew <- c(ab,cd)[ c(newconn_index[1:2]) ] # new arc 1
+    cdnew <- c(ab,cd)[ c(newconn_index[3:4]) ] # new arc 2
 
-  # catch if there is already a connection there avoiding redundancy and loss of consistent edge density
-  # NB this will allow for original connections to reform
-  ctch <- adjmat[abnew[1], abnew[2]] == 1 | adjmat[cdnew[1], cdnew[2]] == 1
+    # catch if there is already a connection there avoiding redundancy and loss of consistent edge density
+    # NB this will allow for original connections to reform
+    ctch <- adjmat[abnew[1], abnew[2]] == 1 | adjmat[cdnew[1], cdnew[2]] == 1
 
   }
 
@@ -80,47 +88,47 @@ updateNetworkConnections <- function(adjmat = NULL, N) {
 #' @inheritParams sim_Gillespie_SIR
 #' @noMd
 #' @export
-genInitialConnections <- function(N, rho) {
+genInitialConnections <- function(initNC, N) {
 
   # initial contacts, assume a binomial prob dist
-  initedgedens <- round( N * (1 - exp(-rho)) ) # round to nearest whole number for edge
+  #initedgedens <- ceiling( N * (1 - exp(-rho)) ) # round to nearest whole number for edge (ceiling so always at least 1)
+  #initedgedens <- initNC
 
   #......................
-  # greedy approach to make initial adjacency matrix
+  # greedy function to make initial adjacency matrix
   #......................
-  conn <- matrix(0, N, N)
-
-  for(i in 1:(N-1)) { # for each node
-    for (j in (i+1):N) { # in the upper triangle
-      newconns <- 1:N
-      newconns <- newconns[i != 1:N] # no selves
-      while (sum(conn[i,]) < initedgedens) { # until we have init edge density
-        j <- sample(newconns, 1) # sample a connection
-        if (sum(conn[,j]) < initedgedens) { # look ahead to make sure new node is not saturated
+  greedy_contactmat_generator <- function(conn) {
+    for(i in 1:N) { # for each node
+      while (sum(conn[i,]) < initNC) { # until we have init edge density
+        newconns <- which(colSums(conn) != initNC) # these nodes are saturated, so pick ones that aren't
+        newconns <- newconns[newconns != i] # can't be self
+        if (length(newconns) == 0) { # all connections saturated
+          break
+        } else {
+          j <- sample(newconns, 1) # sample a connection
           conn[i,j] <- 1
           conn[j,i] <- 1
         }
       }
-    }
+    } # end for loop
+    return(conn)
+  }
+  #......................
+  # run function
+  #......................
+  contactmat_edge_anydiff <- TRUE
+  while(contactmat_edge_anydiff) { # recursively doing this for transitivity issue leading to early saturation w/out all nodes having equal edge density
+    contactmat <- matrix(0, N, N) # reset
+    contactmat <- greedy_contactmat_generator(conn = contactmat)
+    contactmat_edge_anydiff <- !all(rowSums(contactmat) == initNC) # break while loop if we have an acceptable solution
   }
 
   # isSymmetric(conn) # must be true
   # out
-  return(conn)
+  return(contactmat)
 }
 
 
-
-#' @title Generate Random Beta matrix
-#' @param N integer; population size
-#' @noMd
-#' @export
-
-genRandomBetaMat <- function(N) {
-  ret <- matrix(runif(N^2), ncol = N, nrow = N)
-  diag(ret) <- 0
-  return(ret)
-}
 
 #' @title Bind SIR trajectories
 #' @param x list of vectors matrix

@@ -77,6 +77,20 @@ Diary of manuscripts for Tri-CePPI project and `fomes` model.
 
 
 
+### [Cárdenas _et al._ 2023/Opqua](https://www.biorxiv.org/content/10.1101/2021.12.16.473045v2.full.pdf)
+
+**_TA_**:  Fitness landscapes
+
+##### Model Framework     
+
+##### Coding Decisions  
+
+
+
+
+
+
+
 ## ID Dynamic Modeling Insights
 
 ### General

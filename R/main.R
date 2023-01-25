@@ -4,19 +4,33 @@
 #' @param beta numeric vector; Probability of transmission given contact for S_i I_j elements
 #' @param dur_I numeric; Duration of infection
 #' @param term_time numeric; time termination condition
+#' @param init_contact_mat matrix; User specified initial contact, or adjacency matrix.
+#' The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
+#' and have the same edge density, number of connections, for each node, or individual.
+#' Default value of NULL results in internal function generating intial contact matrix.
+#' @param initi NC integer; initial connections; NB only used if an initial matrix is not provided
 #' @param rho numeric; network rewiring rate
+#' @param return_contact_matrices boolean; Option to return contact matrices throughout dynamic iterations.
+#' Warning, this can be memory intensive.
 #' @description
 #' Assuming:
 #' \itemize{
 #'     closed population
 #' }
+#' @returns The return:
+#' \itemize{
+#'     conn_traj boolean whether or not event included a rewiring
+#' }
 #' @export
 
 sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
-                              beta = matrix(1, 10, 10),
+                              beta = rep(1, 10),
                               dur_I = 1,
+                              init_contact_mat = NULL,
                               rho = 0.05,
-                              term_time = 500) {
+                              initNC = NA,
+                              term_time = 500,
+                              return_contact_matrices = FALSE) {
 
   #............................................................
   # assertions
@@ -24,12 +38,37 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   goodegg::assert_single_int(Iseed)
   goodegg::assert_single_int(N)
   goodegg::assert_numeric(dur_I)
-  goodegg::assert_square_matrix(beta)
-  goodegg::assert_dim(beta, c(N,N))
+  goodegg::assert_vector(beta)
+  goodegg::assert_length(beta, N, message = "Beta vector must be of same length as population size, N")
+
+  #............................................................
+  # initial contact adjacency matrix
+  #...........................................................
+  goodegg::assert_single_numeric(rho)
+  goodegg::assert_gr(rho, 0)
+  if (!is.null(init_contact_mat)) {
+    # user input initial contact matrix
+    goodegg::assert_square_matrix(init_contact_mat)
+    goodegg::assert_symmetric_matrix(init_contact_mat)
+    goodegg::assert_dim(init_contact_mat, c(N,N))
+    #TODO discuss this check
+    goodegg::assert_eq(sum(diag(init_contact_mat)), 0,
+                       message = "Diagonal should be population with 0 to represent self")
+    goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
+                           message = "Each node, or individual, must have the same edge density for the initial contact matrix")
+    conn <- init_contact_mat
+  } else {
+    goodegg::assert_single_int(initNC, N)
+    # simulate initial contact matrix
+    conn <- genInitialConnections(initNC, N)
+  }
+
 
   #............................................................
   # initialize and storage
   #...........................................................
+  # lift over beta want B1 - BN as a column copied N times (square matrix with B varying by rows, so columns are replicates)
+  beta <- outer(beta, rep(1,N))
   # vector inits
   I_now <- rep(0, N)
   I_now[1:Iseed] <- 1
@@ -37,24 +76,23 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   R_now <- rep(0, N)
   Inds <- 1:N
 
-
   # time keeping
-  i <- 2 # i of 1 is our initial conditions and time of 0
-  t <- time <- 0.0
+  Time_traj <- currtime <- 0.0
 
   # trajectories for score keeping and plotting
   S_traj <- list(S_now)
   I_traj <- list(I_now)
   R_traj <- list(R_now)
-
-  # initial contact matrix
-  conn <- genInitialConnections(N, rho)
+  event_traj <- c("init")
+  if (return_contact_matrices) {
+    contact_store <- list(conn)
+  }
 
   #............................................................
   # run simulation based on rates and events
   #...........................................................
 
-  while (time < term_time) {
+  while (currtime < term_time) {
 
     # catch - if no infxns, exit loop
     if (sum(I_now) == 0) {
@@ -67,13 +105,13 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates
-    now_dur_I <- (1/dur_I) * I_now
+    now_dur_I <- dur_I * I_now
     rate_r <- sum(now_dur_I)
 
     # Calculate time until each of the events occurs
     event <- c("rewire" = Inf,
                "transmission" = Inf,
-                "recovery" = Inf)
+               "recovery" = Inf)
     if (rate_t > 0) {
       event[["rewire"]] <- rexp(1, rho)
     }
@@ -88,7 +126,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     next_event <- names(event)[which(event == min(event))]
 
     # Jump to that time
-    time <- time + event[[next_event]]
+    currtime <- currtime + event[[next_event]]
 
     # make change for earliest event
     if (next_event == "rewire") {
@@ -118,12 +156,14 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # Update lists and time vec
-    t <- c(t, time)
+    Time_traj <- c(Time_traj, currtime)
     S_traj <- append(S_traj, list(S_now))
     I_traj <- append(I_traj, list(I_now))
     R_traj <- append(R_traj, list(R_now))
-    # update counter
-    i <- i + 1
+    event_traj <- c(event_traj, next_event)
+    if (return_contact_matrices) {
+      contact_store <- append(contact_store, list(conn))
+    }
   }
 
   # out
@@ -131,8 +171,14 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     S_traj = tidy_traj_out(S_traj),
     I_traj = tidy_traj_out(I_traj),
     R_traj = tidy_traj_out(R_traj),
-    time = t
+    Event_traj = event_traj,
+    Time_traj = Time_traj
   )
+
+  if (return_contact_matrices) {
+    out <- append(out, list("contact_store" = contact_store))
+  }
+
   return(out)
 }
 
