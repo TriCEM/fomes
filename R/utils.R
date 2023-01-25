@@ -37,9 +37,16 @@ rewireNEnodes <- function(adjmat = NULL, N) {
     currconn_j <- ceiling(currconn_s/N) # get j
     ab <- c(currconn_i[1], currconn_j[1])
     cd <- c(currconn_i[2], currconn_j[2])
-
-    # catch for diagonal or same connection on opposite sides of triangle (lower vs upper)
-    ctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1 | paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
+    #......................
+    # catches
+    #......................
+    # can't be a diagonal
+    diagctch <- length(unique(ab)) == 1 | length(unique(cd)) == 1
+    # can't be on opposite sides of the triangle
+    trigctch <- paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
+    # can't share nodes between pairs
+    ndctch <- length(unique(c(ab, cd))) == 4
+    ctch <- any(c(diagctch, trigctch, ndctch))
   }
 
   # erase prior connections

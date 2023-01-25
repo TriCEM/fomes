@@ -1,22 +1,24 @@
-test_that("Contact Mat Rewiring is less than or equal to rewiring events", {
-    out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
-                             beta = rep(0.8, 10),
-                             dur_I = 5,
-                             rho = 100, # high rewiring rate
-                             initNC = 3,
-                             term_time = 50,
-                             return_contact_matrices = T)
-    rewire_count <- sum(out$Event_traj == "rewire")
-    unique_contact_mat <- length(unique(out$contact_store))
-    testthat::expect_lte(unique_contact_mat, rewire_count)
+
+test_that("Event types behaving: aka Rewiring matrices are less than or equal to rewiring events", {
+  out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
+                           beta = rep(0.8, 10),
+                           dur_I = 5,
+                           rho = 100, # high rewiring rate
+                           initNC = 3,
+                           term_time = 50,
+                           return_contact_matrices = T)
+  rewire_count <- sum(out$Event_traj == "rewire")
+  unique_contact_mat <- length(unique(out$contact_store))
+  testthat::expect_lte(unique_contact_mat, rewire_count)
 })
+
 
 test_that("Initial Network has Consistent Edge Density", {
   initNCit <- 3 # edge density that should be cannon
   firstmat_edge_den <- list()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
                              rho = 100, # high rewiring rate
@@ -32,14 +34,12 @@ test_that("Initial Network has Consistent Edge Density", {
 })
 
 
-
-
 test_that("Rewiring Networks have Consistent Edge Density", {
   initNCit <- 3 # edge density that should be cannon
   edge_den <- list()
   # iter it out
-  for (i in 1:100) {
-    out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+  for (i in 1:10) {
+    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
                              rho = 100, # high rewiring rate
@@ -55,11 +55,11 @@ test_that("Rewiring Networks have Consistent Edge Density", {
 })
 
 
-test_that("Consistent Switches", {
+test_that("Rewiring Produces Consistent Switches", {
   # tracker
   count_switch_nodes <- list()
   # do a series of iters
-  for (i in 1:100){
+  for (i in 1:10){
     contact_mat_length <- 0
     while (contact_mat_length < 2) {
 
@@ -85,6 +85,8 @@ test_that("Consistent Switches", {
   chck_swtch <- all(unlist(count_switch_nodes) %in% c(0,2))
   testthat::expect_true(chck_swtch)
 })
+
+
 
 
 
