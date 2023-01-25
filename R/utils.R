@@ -32,8 +32,9 @@ rewireNEnodes <- function(adjmat = NULL, N) {
     currconn <- which(adjmat == 1)
     # sample two current connections
     currconn_s <- sample(currconn, size = 2, replace = F)
-    currconn_i <- ceiling(currconn_s/N) # get i
-    currconn_j <- currconn_s %% N # get j
+    currconn_i <- currconn_s %% N # get i
+    currconn_i[currconn_i == 0] <- N # no remainder means last row
+    currconn_j <- ceiling(currconn_s/N) # get j
     ab <- c(currconn_i[1], currconn_j[1])
     cd <- c(currconn_i[2], currconn_j[2])
 
@@ -87,21 +88,19 @@ genInitialConnections <- function(initNC, N) {
   #initedgedens <- initNC
 
   #......................
-  # greedy approach to make initial adjacency matrix
+  # greedy function to make initial adjacency matrix
   #......................
   greedy_contactmat_generator <- function(conn) {
     for(i in 1:N) { # for each node
       while (sum(conn[i,]) < initNC) { # until we have init edge density
-        newconns <- which(colSums(conn) != initNC)
-        newconns <- newconns[newconns != i]
+        newconns <- which(colSums(conn) != initNC) # these nodes are saturated, so pick ones that aren't
+        newconns <- newconns[newconns != i] # can't be self
         if (length(newconns) == 0) { # all connections saturated
           break
         } else {
           j <- sample(newconns, 1) # sample a connection
-          if (sum(conn[,j]) < initNC) { # look ahead to make sure new node is not saturated (since the check is outside while)
-            conn[i,j] <- 1
-            conn[j,i] <- 1
-          }
+          conn[i,j] <- 1
+          conn[j,i] <- 1
         }
       }
     } # end for loop
@@ -110,9 +109,11 @@ genInitialConnections <- function(initNC, N) {
   #......................
   # run function
   #......................
-  contactmat <- matrix(0, N, N)
-  while(all(rowSums(contactmat) != initNC)) { # recursively doing this for transitivity issue leading to early saturation w/out all nodes having equal edge density
+  contactmat_edge_anydiff <- TRUE
+  while(contactmat_edge_anydiff) { # recursively doing this for transitivity issue leading to early saturation w/out all nodes having equal edge density
+    contactmat <- matrix(0, N, N) # reset
     contactmat <- greedy_contactmat_generator(conn = contactmat)
+    contactmat_edge_anydiff <- !all(rowSums(contactmat) == initNC) # break while loop if we have an acceptable solution
   }
 
   # isSymmetric(conn) # must be true
