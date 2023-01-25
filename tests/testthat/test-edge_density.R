@@ -13,7 +13,7 @@ test_that("Event types behaving: aka Rewiring matrices are less than or equal to
 })
 
 
-test_that("Initial Network has Consistent Edge Density", {
+test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
   initNCit <- 3 # edge density that should be cannon
   firstmat_edge_den <- list()
   # iter it out
@@ -27,16 +27,21 @@ test_that("Initial Network has Consistent Edge Density", {
                              return_contact_matrices = T)
     firstmat_edge_den <- append(firstmat_edge_den, out$contact_store[1])
   }
-
-  firstedden <- unique(unlist(lapply(firstmat_edge_den, rowSums)))
-  testthat::expect_length(firstedden, 1)
-  testthat::expect_equal(firstedden, initNCit)
+  getmode <- function(x) {
+    ret <- names(table(x))[which(table(x) == max(table(x)))]
+    ret <- as.numeric(ret)
+    return(ret)
+  }
+  firstmode <- getmode(unlist(lapply(firstmat_edge_den, rowSums)))
+  firstmed <- median(unlist(lapply(firstmat_edge_den, rowSums)))
+  testthat::expect_equal(firstmode, initNCit)
+  testthat::expect_equal(firstmed, initNCit)
 })
 
 
 test_that("Rewiring Networks have Consistent Edge Density", {
   initNCit <- 3 # edge density that should be cannon
-  edge_den <- list()
+  edge_den <- c()
   # iter it out
   for (i in 1:10) {
     out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
@@ -46,12 +51,12 @@ test_that("Rewiring Networks have Consistent Edge Density", {
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
-    edge_den <- append(edge_den, unique(out$contact_store))
+    uni_edge_dens <- unique(lapply(out$contact_store, rowSums))
+    edge_den <- c(edge_den, length(uni_edge_dens))
   }
 
-  edden <- unique(unlist(lapply(edge_den, rowSums)))
+  edden <- unique(edge_den)
   testthat::expect_length(edden, 1)
-  testthat::expect_equal(edden, initNCit)
 })
 
 

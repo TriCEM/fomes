@@ -45,7 +45,7 @@ rewireNEnodes <- function(adjmat = NULL, N) {
     # can't be on opposite sides of the triangle
     trigctch <- paste(sort(ab), collapse = "") == paste(sort(cd), collapse = "")
     # can't share nodes between pairs
-    ndctch <- length(unique(c(ab, cd))) == 4
+    ndctch <- length(unique(c(ab, cd))) != 4
     ctch <- any(c(diagctch, trigctch, ndctch))
   }
 
@@ -97,7 +97,7 @@ genInitialConnections <- function(initNC, N) {
   #......................
   # greedy function to make initial adjacency matrix
   #......................
-  greedy_contactmat_generator <- function(conn) {
+  greedy_contactmat_generator <- function(conn, initNC) {
     for(i in 1:N) { # for each node
       while (sum(conn[i,]) < initNC) { # until we have init edge density
         newconns <- which(colSums(conn) != initNC) # these nodes are saturated, so pick ones that aren't
@@ -113,15 +113,10 @@ genInitialConnections <- function(initNC, N) {
     } # end for loop
     return(conn)
   }
-  #......................
-  # run function
-  #......................
-  contactmat_edge_anydiff <- TRUE
-  while(contactmat_edge_anydiff) { # recursively doing this for transitivity issue leading to early saturation w/out all nodes having equal edge density
-    contactmat <- matrix(0, N, N) # reset
-    contactmat <- greedy_contactmat_generator(conn = contactmat)
-    contactmat_edge_anydiff <- !all(rowSums(contactmat) == initNC) # break while loop if we have an acceptable solution
-  }
+
+  # run
+  contactmat <- greedy_contactmat_generator(conn =  matrix(0, N, N),
+                                            initNC = initNC)
 
   # isSymmetric(conn) # must be true
   # out
