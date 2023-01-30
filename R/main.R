@@ -31,7 +31,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
                               initNC = NA,
                               term_time = 500,
                               return_contact_matrices = FALSE) {
-
+  # runtime
+  starttime <- Sys.time()
   #............................................................
   # assertions
   #...........................................................
@@ -180,13 +181,16 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     I_traj = tidy_traj_out(I_traj),
     R_traj = tidy_traj_out(R_traj),
     Event_traj = event_traj,
-    Time_traj = Time_traj
+    Time_traj = Time_traj,
+    runTime = round(Sys.time() - starttime, 2)
   )
 
   if (return_contact_matrices) {
     out <- append(out, list("contact_store" = contact_store))
   }
 
+  # add S3 class structure
+  attr(out, "class") <- "GillespieSIRne"
   return(out)
 }
 

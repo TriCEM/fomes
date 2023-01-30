@@ -15,7 +15,9 @@ Imports:
     stats,
     Rcpp,
     goodegg,
-    igraph
+    igraph,
+    tibble,
+    crayon
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 
