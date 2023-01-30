@@ -38,8 +38,6 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   goodegg::assert_single_int(Iseed)
   goodegg::assert_single_int(N)
   goodegg::assert_numeric(dur_I)
-  goodegg::assert_vector(beta)
-  goodegg::assert_length(beta, N, message = "Beta vector must be of same length as population size, N")
 
   #............................................................
   # initial contact adjacency matrix
@@ -51,24 +49,34 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     goodegg::assert_square_matrix(init_contact_mat)
     goodegg::assert_symmetric_matrix(init_contact_mat)
     goodegg::assert_dim(init_contact_mat, c(N,N))
-    #TODO discuss this check
     goodegg::assert_eq(sum(diag(init_contact_mat)), 0,
                        message = "Diagonal should be population with 0 to represent self")
     goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
                            message = "Each node, or individual, must have the same edge density for the initial contact matrix")
     conn <- init_contact_mat
   } else {
-    goodegg::assert_single_int(initNC, N)
+    goodegg::assert_single_int(initNC)
     # simulate initial contact matrix
     conn <- genInitialConnections(initNC, N)
+  }
+
+  if (is.vector(beta)) { # if beta is a vector make matrix but if it is a matrix, leave it alone
+    goodegg::assert_vector(beta)
+    goodegg::assert_length(beta, N, message = "Beta vector must be of same length as population size, N")
+    # lift over beta want B1 - BN as a column copied N times (square matrix with B varying by rows, so columns are replicates)
+    beta <- outer(beta, rep(1,N))
+
+  } else if (is.matrix(beta)) {
+    goodegg::assert_square_matrix(beta)
+    goodegg::assert_length(nrow(beta), N, message = "Beta matrix must have square dimensions corresponding to population size, NxN")
+  } else {
+    stop("Beta must either be a vector or matrix")
   }
 
 
   #............................................................
   # initialize and storage
   #...........................................................
-  # lift over beta want B1 - BN as a column copied N times (square matrix with B varying by rows, so columns are replicates)
-  beta <- outer(beta, rep(1,N))
   # vector inits
   I_now <- rep(0, N)
   I_now[1:Iseed] <- 1
@@ -100,8 +108,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-    betaSI <- beta * outer(I_now, S_now) * conn # betaSI has elements beta_i,j * S_j * I_i * connections
-    # density dependent
+    betaSI <- beta * 1/N * outer(I_now, S_now) * conn # betaSI has elements beta_i,j * S_j * I_i * connections
+    # frequency dependent
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates

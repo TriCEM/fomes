@@ -17,7 +17,7 @@ genInitialConnections <- function(initNC, N) {
                                             type = "both",
                                             names = FALSE,
                                             sparse = FALSE)
-  # isSymmetric(conn) # must be true
+  # is.Symmetric(conn) # must be true
   # out
   return(contactmat)
 }
