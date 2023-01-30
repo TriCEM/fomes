@@ -7,6 +7,6 @@ test_that("main model runs", {
                     initNC = 3,
                     term_time = 500)
 
-  testthat::expect_equal(length(out), 5)
+  testthat::expect_equal(length(out), 6)
 
 })
