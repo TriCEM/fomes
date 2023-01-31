@@ -10,16 +10,28 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/installation.html</loc>
+  </url>
+  <url>
+    <loc>/articles/quickstart.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/genRandomBetaMat.html</loc>
+    <loc>/reference/genInitialConnections.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rewireNEnodes.html</loc>
   </url>
   <url>
     <loc>/reference/sim_Gillespie_SIR.html</loc>

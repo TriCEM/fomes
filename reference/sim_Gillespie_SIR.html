@@ -27,6 +27,13 @@ closed population
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/installation.html">Installing `fomes`</a>
+    <a class="dropdown-item" href="../articles/quickstart.html">Quick Start</a>
+  </div>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -50,10 +57,14 @@ closed population
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sim_Gillespie_SIR</span><span class="op">(</span></span>
 <span>  Iseed <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  N <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  beta <span class="op">=</span> <span class="fu"><a href="genRandomBetaMat.html">genRandomBetaMat</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span>,</span>
+<span>  N <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  beta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span><span class="op">)</span>,</span>
 <span>  dur_I <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  term_time <span class="op">=</span> <span class="fl">500</span></span>
+<span>  init_contact_mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rho <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  initNC <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  term_time <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  return_contact_matrices <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,17 +79,43 @@ closed population
 
 
 <dt>beta</dt>
-<dd><p>numeric vector; Effective contact rate for S_i I_j elements</p></dd>
+<dd><p>numeric vector; Probability of transmission given contact for S_i I_j elements</p></dd>
 
 
 <dt>dur_I</dt>
 <dd><p>numeric; Duration of infection</p></dd>
 
 
+<dt>init_contact_mat</dt>
+<dd><p>matrix; User specified initial contact, or adjacency matrix.
+The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
+and have the same edge density, number of connections, for each node, or individual.
+Default value of NULL results in internal function generating intial contact matrix.</p></dd>
+
+
+<dt>rho</dt>
+<dd><p>numeric; network rewiring rate</p></dd>
+
+
+<dt>initNC</dt>
+<dd><p>NC integer; initial connections; NB only used if an initial matrix is not provided</p></dd>
+
+
 <dt>term_time</dt>
 <dd><p>numeric; time termination condition</p></dd>
 
+
+<dt>return_contact_matrices</dt>
+<dd><p>boolean; Option to return contact matrices throughout dynamic iterations.
+Warning, this can be memory intensive.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>The return:</p><ul><li><p>conn_traj boolean whether or not event included a rewiring</p></li>
+</ul></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
