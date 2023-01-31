@@ -9,4 +9,12 @@ test_that("main model runs", {
 
   testthat::expect_equal(length(out), 6)
 
+
+  # traditional model for internal checks and comparisons
+ out <- fomes:::tradsim_Gillespie_SIR(Iseed = 1, N = 10,
+                        beta = 1,
+                        dur_I = 1,
+                        term_time = 500)
+ testthat::expect_type(out, "list")
+ testthat::expect_equal(class(out), "data.frame")
 })

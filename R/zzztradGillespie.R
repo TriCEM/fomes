@@ -33,7 +33,6 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   R_traj <- R_now <- 0
   Inds <- 1:N
   # time keeping
-  i <- 2 # i of 1 is our initial conditions and time of 0
   t <- time <- 0.0
 
   #............................................................
@@ -48,9 +47,9 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-    rate_t <- beta * I_now * S_now    # density dependent
+    rate_t <- beta/N * I_now * S_now    # density dependent
     # recovery rates
-    rate_r <- (1/dur_I) * I_now
+    rate_r <- dur_I * I_now
 
     # Calculate time until each of the events occurs
     event <- c("transmission" = Inf,
@@ -83,17 +82,14 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     S_traj <- c(S_traj, S_now)
     I_traj <- c(I_traj, I_now)
     R_traj <- c(R_traj, R_now)
-    # update counter
-    i <- i + 1
-
   }
 
   # out
   out <- data.frame(
-    time = t,
-    numSusc = S_traj,
-    numInfxn = I_traj,
-    numRecov = R_traj
+    Time = t,
+    Susc = S_traj,
+    Infxn = I_traj,
+    Recov = R_traj
   )
   return(out)
 }
