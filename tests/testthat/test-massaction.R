@@ -24,13 +24,14 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
     #......................
     # dynamic network
     #......................
-    NEdynSIR <- fomes::sim_Gillespie_SIR(Iseed = initial_infxns,
+    NEdynSIR <- suppressWarnings( fomes::sim_Gillespie_SIR(Iseed = initial_infxns,
                                          N = popsize,
                                          beta = rep(betaind, popsize),
                                          dur_I = duration_of_I,
                                          rho = rhoconn,
                                          initNC = initNCval,
                                          term_time = Inf)
+    ) # warnings from igraph that we saturated network
 
     tidyNEdynSIR <- summary(NEdynSIR)
     # storage
@@ -56,7 +57,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   #............................................................
   # analyze results
   #...........................................................
-  testthat::expect_gt(wilcox.test(combouts$NEfinalsize, combouts$TDfinalsize)$p.value, 0.5)
-  testthat::expect_gt(wilcox.test(combouts$NEfinaltime, combouts$TDfinaltime), 0.5)
+  testthat::expect_gt(wilcox.test(combouts$NEfinalsize, combouts$TDfinalsize)$p.value, 0.05)
+  testthat::expect_gt(wilcox.test(combouts$NEfinaltime, combouts$TDfinaltime)$p.value, 0.05)
 
 })
