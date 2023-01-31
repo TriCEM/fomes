@@ -1,0 +1,9 @@
+Iseed: 1
+N: 10
+beta: 10,10,10,10,10,10,10,10,10,10
+dur_I: 1
+init_contact_mat: NULL
+rho: 0.05
+initNC: 5
+term_time: 500
+return_contact_matrices: FALSE

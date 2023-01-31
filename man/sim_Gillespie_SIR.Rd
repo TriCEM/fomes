@@ -6,10 +6,14 @@
 \usage{
 sim_Gillespie_SIR(
   Iseed = 1,
-  N = 1000,
-  beta = genRandomBetaMat(N),
+  N = 10,
+  beta = rep(1, 10),
   dur_I = 1,
-  term_time = 500
+  init_contact_mat = NULL,
+  rho = 0.05,
+  initNC = NA,
+  term_time = 500,
+  return_contact_matrices = FALSE
 )
 }
 \arguments{
@@ -17,11 +21,29 @@ sim_Gillespie_SIR(
 
 \item{N}{integer; population size}
 
-\item{beta}{numeric vector; Effective contact rate for S_i I_j elements}
+\item{beta}{numeric vector; Probability of transmission given contact for S_i I_j elements}
 
 \item{dur_I}{numeric; Duration of infection}
 
+\item{init_contact_mat}{matrix; User specified initial contact, or adjacency matrix.
+The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
+and have the same edge density, number of connections, for each node, or individual.
+Default value of NULL results in internal function generating intial contact matrix.}
+
+\item{rho}{numeric; network rewiring rate}
+
+\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided}
+
 \item{term_time}{numeric; time termination condition}
+
+\item{return_contact_matrices}{boolean; Option to return contact matrices throughout dynamic iterations.
+Warning, this can be memory intensive.}
+}
+\value{
+The return:
+\itemize{
+conn_traj boolean whether or not event included a rewiring
+}
 }
 \description{
 Assuming:

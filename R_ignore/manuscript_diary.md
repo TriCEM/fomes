@@ -77,6 +77,20 @@ Diary of manuscripts for Tri-CePPI project and `fomes` model.
 
 
 
+### [Cárdenas _et al._ 2023/Opqua](https://www.biorxiv.org/content/10.1101/2021.12.16.473045v2.full.pdf)
+
+**_TA_**:  Fitness landscapes
+
+##### Model Framework     
+
+##### Coding Decisions  
+
+
+
+
+
+
+
 ## ID Dynamic Modeling Insights
 
 ### General
@@ -110,11 +124,11 @@ Idea of overdispersion key at low incidence intersections. Takes very few inter-
 
 #### [Volz & Meyer 2007](https://pubmed.ncbi.nlm.nih.gov/17878137/)
 
-**_TA_**: Neighbor exchnage model for including dynamicism into contact networks. 
+**_TA_**: Neighbor exchange model for including dynamicism into contact networks. 
 
 #### [Volz 2008](https://link.springer.com/article/10.1007/s00285-007-0116-4)
 
-**_TA_**: Neighbor exchnage model for including dynamicism into contact networks. 
+**_TA_**: ... 
 
 
 

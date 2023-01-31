@@ -1,0 +1,37 @@
+---
+title: "Quick Start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Installing `fomes`}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(fomes)
+```
+
+# Description
+The model is ... 
+
+# Running Model 
+
+To run the model... 
+
+```{r}
+out <- sim_Gillespie_SIR(Iseed = 1, N = 1e3,
+                         beta = rep(1, 1e3),
+                         dur_I = 5,
+                         rho = 5,
+                         initNC = 3,
+                         term_time = 500)
+```

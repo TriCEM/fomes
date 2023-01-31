@@ -12,11 +12,18 @@ RoxygenNote: 7.2.1
 LinkingTo: 
     Rcpp
 Imports: 
+    stats,
     Rcpp,
-    goodegg
+    goodegg,
+    igraph,
+    tibble,
+    crayon
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 
     covr,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
