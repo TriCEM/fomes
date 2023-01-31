@@ -1,7 +1,7 @@
 
 test_that("Event types behaving: aka Rewiring matrices are less than or equal to rewiring events", {
-  out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
-                           beta = rep(0.8, 10),
+  out <- sim_Gillespie_SIR(Iseed = 1, N = 1e3,
+                           beta = rep(0.8, 1e3),
                            dur_I = 5,
                            rho = 100, # high rewiring rate
                            initNC = 3,
