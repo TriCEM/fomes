@@ -45,7 +45,7 @@ tidyout <- function(x) {
 
 tidyout.GillespieSIRne <- function(x) {
   # final epidemic size
-  finalsize <- sum(x$Event_traj == "transmission")
+  finalsize <- sum(x$I_traj[1,]) + sum(x$Event_traj == "transmission")
   # summary table
   cumeventdf <- tibble::tibble(
     Time = x$Time_traj,
