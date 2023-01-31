@@ -46,6 +46,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   goodegg::assert_single_numeric(rho)
   goodegg::assert_gr(rho, 0)
   if (!is.null(init_contact_mat)) {
+    goodegg::assert_NA(initNC, message = "If the user has provided an initial contact matrix, the initial connection rate must be sent to NA")
     # user input initial contact matrix
     goodegg::assert_square_matrix(init_contact_mat)
     goodegg::assert_symmetric_matrix(init_contact_mat)
@@ -57,6 +58,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     conn <- init_contact_mat
   } else {
     goodegg::assert_single_int(initNC)
+    goodegg::assert_le(initNC, N)
     # simulate initial contact matrix
     conn <- genInitialConnections(initNC, N)
   }
