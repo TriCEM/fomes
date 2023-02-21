@@ -2,7 +2,7 @@
 title: "Quick Start"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Installing `fomes`}
+  %\VignetteIndexEntry{Quick Start}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
