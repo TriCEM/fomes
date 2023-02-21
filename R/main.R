@@ -116,7 +116,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
     # recovery rates
-    now_dur_I <- dur_I * I_now
+    now_dur_I <- (1/dur_I) * I_now
     rate_r <- sum(now_dur_I)
 
     # Calculate time until each of the events occurs
