@@ -6,7 +6,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   duration_of_I <- 5
   initial_infxns <- 1
   initNCval <- 99
-  betaind <- 8
+  betaind <- 1
   rhoconn <- 1e-100
 
   # storage

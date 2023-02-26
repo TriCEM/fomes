@@ -5,6 +5,10 @@ Diary of manuscripts for Tri-CePPI project and `fomes` model.
 
 
 
+[TOC]
+
+
+
 
 ## Agent-Based Stochastic Models
 ### [Shchur _et al._ 2022/VGsim](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010409)
@@ -103,6 +107,8 @@ Diary of manuscripts for Tri-CePPI project and `fomes` model.
 **_TA_**: Persepctive on various "engines" or factors driving SARS-Cov-2 transmission. Useful to think about predicitive variables. Type of transmission routes will differ depending on spatial scale and environmental conditions (e.g. household contacts, droplet vs fomite doesn't matter; aerosolized matters at community level; influenza in tropical regions more by fomites vs in low-humid regions, more by aerosolized)
 Idea of overdispersion key at low incidence intersections. Takes very few inter-regional connections to produce "small world" network dynamics
 
+
+
 ### Phylodynamics
 #### [Rasmussen _et al._ 2011/Nonlinear SIR Inference with Time Series](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3161897/)
 
@@ -115,20 +121,49 @@ Idea of overdispersion key at low incidence intersections. Takes very few inter-
 **_TA_**: Canonical flu spread via airlines/networks manuscript. Hidden geometries and flux model
 
 
+
+
+
+
 ### Superspreading
 #### [Loyd-Smith _et al._ 2005](https://www.nature.com/articles/nature04153)
 
 **_TA_**:
 
+
+
 ### Dynamic Networks
 
 #### [Volz & Meyer 2007](https://pubmed.ncbi.nlm.nih.gov/17878137/)
 
-**_TA_**: Neighbor exchange model for including dynamicism into contact networks. 
+**_TA_**: Neighbor exchange model for including dynamicism into contact networks. NE essentially leverages rewiring probability to toggle between a static and closer to dynamic network dynamics. 
 
 #### [Volz 2008](https://link.springer.com/article/10.1007/s00285-007-0116-4)
 
 **_TA_**: ... 
+
+#### [Vernon & Keeling 2008](https://royalsocietypublishing.org/doi/10.1098/rspb.2008.1009)
+
+**_TA_**: Dyanmic networks needed to capture nuances of disease spread. Final epidemic sizes have bimodal shape with dynamic network versus static 2/2 fact that sometimes a node this well connected to a "clique" is accessed during an infectious opportunity and sometimes it is not (infectious timing needs to be right to promote propagation). Interestingly, theoretically year-long weighted static networks do not follow the theoretical derivations given the fact that connections are not made or broken randomly but follow an underlying process related to seasonality, day of week, etc. that constitute complex behaviors: "positive and negative correlations [of connectivity]  at a range of temporal lags". Overall, caution against using approximations of the full dynamic network (as shown above, the intuitive weighted static network fails)
+
+#### [Bansal et al. 2010](https://doi.org/10.1080/17513758.2010.503376)
+
+**_TA_**: Review article. Interesting points: 
+
+- acute infections w/in a small population appropriately captured by a static network --> acute means short lived (no time for dynamicism to take place).
+- Prev work has use time-integrated networks, where "models consider all contacts that may have occurred within a relevant period of time (e.g. an average infectious period) and aggregate these contacts into a single static contact network." --> however, different dyanmicism can result in same static shapes (different processes result in same lower-dimensional representation)
+- Justin's point about ground-hog day reiterated here: there are a number of "chance" encounters that happen in the majority of people's lives 
+- Three types of extrinsic classes relevant to ID Epi that cause dynamicism: [1] extrinsic changes (demography: birth-death; rewiring; migration; socioeconomic changes); [2] pathogen mediated changes (infection -> immunity; change in behavior 2/2 symptoms = infected node changing behavior not susceptible, eg rabies makes more likely to be aggressive); [3] public health mediated changes (vaccination; treatment (antivirals, abx); avoidance behavior; closures and lockdowns)
+- "The work of Colizza et al. [17] and Viboud et al. [61] has shown that global connectivity patterns drive the diffusion of infectious diseases on large scales. Most of these models, however, do not consider dynamic changes in individual-level network connectivity."
+  - scales of connectedness 
+- Social avoidance = edge rewiring not a random -->  "Using a pair-approximation framework, Gross et al. [27] show that such adaptive rewiring leads to modular network structure (consisting of highly intraconnected but only loosely interconnected sub-networks), a wide degree distribution and degree assortavity (a positive correlation in degree between pairs of linked nodes). This reveals two means by which avoidance behaviour can counterintuitively exacerbate epidemics: degree correlations can decrease the effectiveness of targeted vaccination; and high intraconnectivity of the susceptible cluster enables the persistence of epidemics even below the epidemic threshold"
+- [Ferrari et. Al. 2006](https://royalsocietypublishing.org/doi/10.1098/rspb.2006.3636) "demonstrate that infection-acquired immunity due to a prior epidemic results in greater population protection in a heterogeneously structured population, while random vaccination leads to smaller epidemics in highly structured small-world populations.
+
+
+
+#### [Read et al. 2008](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2607433/)
+
+**_TA_**: Determined casual contact (conversations) and close contact (physical contact). Found that casual contacts were more transient/irregular and situation/location dependent (eg workspace) versus close contact occur more often/stable and are often situation/location dependent (eg home or social). Overall suggests that there is modularity in dynamic connections = "core groups". Although, arguably this modularity is in part due to the collection technique of diaries and focusing on the participant's connections (ego) and not all connections ego+alter. _Suggest that daily contacts do not have a long tailed distribution and therefore are not appropriately captured by the power law (as has been claimed in sexual contact networks)_ 
 
 
 

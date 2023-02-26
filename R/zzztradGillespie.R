@@ -47,9 +47,10 @@ tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-    rate_t <- beta/N * I_now * S_now    # density dependent
+    rate_t <- beta * 1/N * I_now * S_now    # density dependent
     # recovery rates
-    rate_r <- dur_I * I_now
+    # recovery rates
+    rate_r <- (1/dur_I) * I_now
 
     # Calculate time until each of the events occurs
     event <- c("transmission" = Inf,
