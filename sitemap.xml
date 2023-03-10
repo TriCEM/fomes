@@ -19,13 +19,13 @@
     <loc>/articles/quickstart.html</loc>
   </url>
   <url>
-    <loc>/articles/test.html</loc>
-  </url>
-  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Cheap_KLdivergence_UnifDist.html</loc>
   </url>
   <url>
     <loc>/reference/genInitialConnections.html</loc>
@@ -34,12 +34,30 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/is.GillespieSIRne.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.GillespieSIRne.html</loc>
+  </url>
+  <url>
     <loc>/reference/rewireNEnodes.html</loc>
   </url>
   <url>
     <loc>/reference/sim_Gillespie_SIR.html</loc>
   </url>
   <url>
+    <loc>/reference/summary.GillespieSIRne.html</loc>
+  </url>
+  <url>
     <loc>/reference/tidy_traj_out.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tidyout.GillespieSIRne.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tidyout.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tradsim_Gillespie_SIR.html</loc>
   </url>
 </urlset>
