@@ -17,6 +17,8 @@ Imports:
     goodegg,
     igraph,
     tibble,
+    magrittr,
+    dplyr,
     crayon
 Remotes:
     nickbrazeau/goodegg,

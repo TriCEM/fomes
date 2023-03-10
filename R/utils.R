@@ -1,16 +1,20 @@
 #............................................................
 # SIR NE S3 Class Overloading
 #...........................................................
-#' @description function for determining if object is of class GillespieSIRne
-#' @noRd
+#' @title Check if GillespieSIRne S3 Class
+#' @description Overload is: function for determining if object is of class GillespieSIRne
+#' @param x GillespieSIRne Simulation
+#' @noMd
 #' @export
 is.GillespieSIRne <- function(x) {
   inherits(x, "is.GillespieSIRne")
 }
 
-
+#' @title print GillespieSIRne S3 Class
 #' @description overload print() function to print summary only
-#' @noRd
+#' @inheritParams is.GillespieSIRne
+#' @param ... further arguments passed to or from other methods.
+#' @noMd
 #' @export
 print.GillespieSIRne <- function(x, ...) {
 
@@ -20,30 +24,44 @@ print.GillespieSIRne <- function(x, ...) {
 
 }
 
+#' @title Summary of GillespieSIRne S3 Class
 #' @description overload summary() function.
-#' @noRd
+#' @param object GillespieSIRne Simulation
+#' @param ... further arguments passed to or from other methods.
+#' @noMd
 #' @export
-summary.GillespieSIRne <- function(x, ...) {
+summary.GillespieSIRne <- function(object, ...) {
   # send summary only
-  return(tidyout.GillespieSIRne(x))
+  return(tidyout.GillespieSIRne(object))
 }
 
 
 #............................................................
 # organzing SIR NE output
 #...........................................................
+#' @title Tidy Out Sim Method
 #' @description Method assignment
-#' @noRd
+#' @inheritParams is.GillespieSIRne
+#' @noMd
 #' @export
 tidyout <- function(x) {
   UseMethod("tidyout")
 }
 
+#' @title Tidy Out Sim
 #' @description Function for taking output of SIR NE and lifting it over
-#' @noRd
+#' @inheritParams is.GillespieSIRne
+#' @noMd
 #' @export
 
 tidyout.GillespieSIRne <- function(x) {
+  #......................
+  # ind lvl
+  #......................
+
+  #......................
+  # summaries
+  #......................
   # final epidemic size
   finalsize <- sum(x$I_traj[1,]) + sum(x$Event_traj == "transmission")
   # summary table
@@ -64,6 +82,7 @@ tidyout.GillespieSIRne <- function(x) {
 
 #' @title Bind SIR trajectories
 #' @param x list of vectors matrix
+#' @details Internal function; not meant for general use
 #' @noMd
 #' @export
 tidy_traj_out <- function(x) {
