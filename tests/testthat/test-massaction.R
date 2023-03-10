@@ -10,7 +10,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   rhoconn <- 1e-100
 
   # storage
-  niters <- 1e2
+  niters <- 1e3
   combouts <- as.data.frame(matrix(NA, nrow = niters, ncol = 5))
   colnames(combouts) <- c("iter",
                           "NEfinalsize", "NEfinaltime",
@@ -59,5 +59,16 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   #...........................................................
   testthat::expect_gt(wilcox.test(combouts$NEfinalsize, combouts$TDfinalsize)$p.value, 0.05)
   testthat::expect_gt(wilcox.test(combouts$NEfinaltime, combouts$TDfinaltime)$p.value, 0.05)
+  # some made up tolerance for divergence
+  mytolsize <- 1
+  mytoltime <- 25
+  # calculate cheap, not stat robust KL
+  fsKL <- Cheap_KLdivergence_UnifDist(p = combouts$NEfinalsize, q = combouts$TDfinalsize)
+  testthat::expect_lt(fsKL, mytolsize)
+
+
+  ftKL <- Cheap_KLdivergence_UnifDist(p = round(combouts$NEfinaltime), q = round(combouts$TDfinaltime))
+  testthat::expect_lt(ftKL, mytoltime)
+
 
 })

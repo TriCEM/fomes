@@ -9,7 +9,6 @@
 #' notably drawing uncoupled times to events and events
 #' @export
 #' @noMd
-#' @noRd
 
 tradsim_Gillespie_SIR <- function(Iseed = 1, N = 10,
                                   beta = 1,

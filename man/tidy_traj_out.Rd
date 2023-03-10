@@ -12,3 +12,6 @@ tidy_traj_out(x)
 \description{
 Bind SIR trajectories
 }
+\details{
+Internal function; not meant for general use
+}
