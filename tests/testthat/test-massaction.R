@@ -63,11 +63,11 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   mytolsize <- 1
   mytoltime <- 25
   # calculate cheap, not stat robust KL
-  fsKL <- KLdivergence_UnifDist(p = combouts$NEfinalsize, q = combouts$TDfinalsize)
+  fsKL <- Cheap_KLdivergence_UnifDist(p = combouts$NEfinalsize, q = combouts$TDfinalsize)
   testthat::expect_lt(fsKL, mytolsize)
 
 
-  ftKL <- KLdivergence_UnifDist(p = round(combouts$NEfinaltime), q = round(combouts$TDfinaltime))
+  ftKL <- Cheap_KLdivergence_UnifDist(p = round(combouts$NEfinaltime), q = round(combouts$TDfinaltime))
   testthat::expect_lt(ftKL, mytoltime)
 
 
