@@ -1,4 +1,4 @@
-#' @title Gillespie Simulation
+#' @title SIR NE Gillespie-Algorithm Simulation Model
 #' @param Iseed integer; Number of initial infections in the population
 #' @param N integer; population size
 #' @param beta numeric vector; Probability of transmission given contact for S_i I_j elements
@@ -8,15 +8,17 @@
 #' The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
 #' and have the same edge density, number of connections, for each node, or individual.
 #' Default value of NULL results in internal function generating intial contact matrix.
-#' @param initNC NC integer; initial connections; NB only used if an initial matrix is not provided
+#' @param initNC NC integer; initial connections; NB only used if an initial matrix is not provided.
 #' @param rho numeric; network rewiring rate
 #' @param return_contact_matrices boolean; Option to return contact matrices throughout dynamic iterations.
 #' Warning, this can be memory intensive.
-#' @description
-#' Assuming:
+#' @description Gillespie Simulation
+#' @details Assuming:
 #' \itemize{
 #'     closed population
 #' }
+#' @details If the user does not input an initial contact matrix, the package will generate an initial contat matrix
+#' with the same edge density for each node using the \code{igraph::degree.sequence.game} function
 #' @returns The return:
 #' \itemize{
 #'     conn_traj boolean whether or not event included a rewiring

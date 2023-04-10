@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{sim_Gillespie_SIR}
 \alias{sim_Gillespie_SIR}
-\title{Gillespie Simulation}
+\title{SIR NE Gillespie-Algorithm Simulation Model}
 \usage{
 sim_Gillespie_SIR(
   Iseed = 1,
@@ -32,7 +32,7 @@ Default value of NULL results in internal function generating intial contact mat
 
 \item{rho}{numeric; network rewiring rate}
 
-\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided}
+\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided.}
 
 \item{term_time}{numeric; time termination condition}
 
@@ -46,8 +46,14 @@ conn_traj boolean whether or not event included a rewiring
 }
 }
 \description{
+Gillespie Simulation
+}
+\details{
 Assuming:
 \itemize{
 closed population
 }
+
+If the user does not input an initial contact matrix, the package will generate an initial contat matrix
+with the same edge density for each node using the \code{igraph::degree.sequence.game} function
 }
