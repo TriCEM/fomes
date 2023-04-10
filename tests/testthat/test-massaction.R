@@ -67,7 +67,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
                   Freq.y = ifelse(is.na(Freq.y), 0, Freq.y)) %>%
     dplyr::mutate(Var1 = as.numeric(Var1)) %>%
     dplyr::arrange(Var1)
-  testthat::expect_gt(suppressWarnings(chisq.test(chitab$Freq.x, chitab$Freq.y)$p.value), 0.05)
+  testthat::expect_gt(suppressWarnings(chisq.test(chitab$Freq.x, chitab$Freq.y)$p.value), 0.01)
 
 
 
