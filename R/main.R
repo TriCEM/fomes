@@ -53,8 +53,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     goodegg::assert_dim(init_contact_mat, c(N,N))
     goodegg::assert_eq(sum(diag(init_contact_mat)), 0,
                        message = "Diagonal should be population with 0 to represent self")
-    goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
-                           message = "Each node, or individual, must have the same edge density for the initial contact matrix")
+   # goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
+   #                         message = "Each node, or individual, must have the same edge density for the initial contact matrix")
     conn <- init_contact_mat
   } else {
     goodegg::assert_single_int(initNC)
