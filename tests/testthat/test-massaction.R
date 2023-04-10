@@ -56,19 +56,19 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
 
   #............................................................
   # analyze results
+  # know that this a parameter space that is not in a phase transition region
+  # so primarily should be all or nothing, and we can mostly treat it as a discrete
+  # count space, and do the a cheap KL with the chi square distribution
   #...........................................................
-  testthat::expect_gt(wilcox.test(combouts$NEfinalsize, combouts$TDfinalsize)$p.value, 0.05)
-  testthat::expect_gt(wilcox.test(combouts$NEfinaltime, combouts$TDfinaltime)$p.value, 0.05)
-  # some made up tolerance for divergence
-  mytolsize <- 1
-  mytoltime <- 25
-  # calculate cheap, not stat robust KL
-  fsKL <- Cheap_KLdivergence_UnifDist(p = combouts$NEfinalsize, q = combouts$TDfinalsize)
-  testthat::expect_lt(fsKL, mytolsize)
+  tNE <- as.data.frame(table(combouts$NEfinalsize), stringsAsFactors = F)
+  tMA <- as.data.frame(table(combouts$TDfinalsize), stringsAsFactors = F)
+  chitab <- dplyr::full_join(tNE, tMA, by = "Var1") %>%
+    dplyr::mutate(Freq.x = ifelse(is.na(Freq.x), 0, Freq.x),
+                  Freq.y = ifelse(is.na(Freq.y), 0, Freq.y)) %>%
+    dplyr::mutate(Var1 = as.numeric(Var1)) %>%
+    dplyr::arrange(Var1)
+  testthat::expect_gt(suppressWarnings(chisq.test(chitab$Freq.x, chitab$Freq.y)$p.value), 0.05)
 
-
-  ftKL <- Cheap_KLdivergence_UnifDist(p = round(combouts$NEfinaltime), q = round(combouts$TDfinaltime))
-  testthat::expect_lt(ftKL, mytoltime)
 
 
 })

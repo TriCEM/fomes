@@ -7,7 +7,7 @@
 genInitialConnections(initNC, N)
 }
 \arguments{
-\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided}
+\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided.}
 
 \item{N}{integer; population size}
 }
