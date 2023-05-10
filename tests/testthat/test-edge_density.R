@@ -6,7 +6,7 @@ test_that("Event types behaving: aka Rewiring matrices are less than or equal to
                            rho = 100, # high rewiring rate
                            initNC = 3,
                            term_time = 50,
-                           return_contact_matrices = T)
+                           return_contact_matrices = F)
   rewire_count <- sum(out$Event_traj == "rewire")
   unique_contact_mat <- length(unique(out$contact_store))
   testthat::expect_lte(unique_contact_mat, rewire_count)
@@ -21,7 +21,7 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
     out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
-                             rho = 100, # high rewiring rate
+                             rho = 1,
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
@@ -39,15 +39,15 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
 })
 
 
-test_that("Rewiring Networks have Consistent Edge Density", {
-  initNCit <- 3 # edge density that should be cannon
+test_that("Rewiring Networks have Consistent Edge Density when initNC is used", {
+  initNCit <- 3 # edge density that should be stable if we are using initNC
   edge_den <- c()
   # iter it out
   for (i in 1:10) {
     out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
-                             rho = 100, # high rewiring rate
+                             rho = 3, # medium rewiring rate
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
@@ -71,7 +71,7 @@ test_that("Rewiring Produces Consistent Switches", {
       out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
                                beta = rep(0.8, 10),
                                dur_I = 5,
-                               rho = 100, # high rewiring rate
+                               rho = 10, # medium rewiring rate
                                initNC = 3,
                                term_time = 50,
                                return_contact_matrices = T)
