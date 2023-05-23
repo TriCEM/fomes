@@ -5,9 +5,10 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   popsize <- 100
   duration_of_I <- 5
   initial_infxns <- 1
-  initNCval <- 99
   betaind <- 1
   rhoconn <- 1e-100
+  conmat <- matrix(1, popsize, popsize)
+  diag(conmat) <- 0
 
   # storage
   niters <- 1e3

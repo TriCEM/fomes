@@ -21,14 +21,14 @@ sim_Gillespie_SIR(
 
 \item{N}{integer; population size}
 
-\item{beta}{numeric vector; Probability of transmission given contact for S_i I_j elements}
+\item{beta}{numeric vector, matrix, or sparseMatrix; Probability of transmission given contact for S_i I_j elements}
 
 \item{dur_I}{numeric; Duration of infection}
 
-\item{init_contact_mat}{matrix; User specified initial contact, or adjacency matrix.
+\item{init_contact_mat}{matrix or sparseMatrix; User specified initial contact, or adjacency matrix.
 The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
 and have the same edge density, number of connections, for each node, or individual.
-Default value of NULL results in internal function generating intial contact matrix.}
+Default value of NULL results in internal function generating initial contact matrix.}
 
 \item{rho}{numeric; network rewiring rate}
 
