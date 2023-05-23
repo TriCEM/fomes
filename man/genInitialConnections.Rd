@@ -4,12 +4,15 @@
 \alias{genInitialConnections}
 \title{Initialize Adjacency Matrix Connections}
 \usage{
-genInitialConnections(initNC, N)
+genInitialConnections(initNC, N, sparseMatrix = TRUE)
 }
 \arguments{
 \item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided.}
 
 \item{N}{integer; population size}
+
+\item{sparseMatrix}{boolean; Whether the returned adjacency matrix should be formatted
+as a sparseMatrix}
 }
 \description{
 Initialize Adjacency Matrix Connections

@@ -32,6 +32,8 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
     ret <- as.numeric(ret)
     return(ret)
   }
+  # liftover
+  firstmat_edge_den <- lapply(firstmat_edge_den, as.matrix)
   firstmode <- getmode(unlist(lapply(firstmat_edge_den, rowSums)))
   firstmed <- median(unlist(lapply(firstmat_edge_den, rowSums)))
   testthat::expect_equal(firstmode, initNCit)
@@ -51,7 +53,9 @@ test_that("Rewiring Networks have Consistent Edge Density when initNC is used", 
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
-    uni_edge_dens <- unique(lapply(out$contact_store, rowSums))
+
+    conns <- lapply(out$contact_store, as.matrix)
+    uni_edge_dens <- unique(lapply(conns, rowSums))
     edge_den <- c(edge_den, length(uni_edge_dens))
   }
 
@@ -79,6 +83,7 @@ test_that("Rewiring Produces Consistent Switches", {
     } # end while
 
     swtch <- unique(out$contact_store)
+    swtch <- lapply(swtch, as.matrix)
     reldiff <- swtch[[1]][upper.tri(swtch[[1]])] - swtch[[2]][upper.tri(swtch[[2]])]
     reldiff <- sum(reldiff == -1)
     count_switch_nodes <- append(count_switch_nodes, reldiff)
