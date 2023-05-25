@@ -142,8 +142,12 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-      # NB: betaSI has elements beta_i,j * S_j * I_i * connections
-    betaSI <- as.matrix( beta * 1/N * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
+    # frequency dependent by degree distribution
+    ni <- rowSums(as.matrix(conn))
+    ni <- 1/ni
+    ni <- outer(ni, rep(1,length(ni)))
+    # NB: betaSI has elements beta_i,j * S_j * I_i * connections
+    betaSI <- as.matrix( beta * ni * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
     # frequency dependent
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 

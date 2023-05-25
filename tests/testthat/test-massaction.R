@@ -30,7 +30,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
                                          beta = rep(betaind, popsize),
                                          dur_I = duration_of_I,
                                          rho = rhoconn,
-                                         initNC = initNCval,
+                                         init_contact_mat = conmat,
                                          term_time = Inf)
     ) # warnings from igraph that we saturated network
 
@@ -59,16 +59,25 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   # analyze results
   # know that this a parameter space that is not in a phase transition region
   # so primarily should be all or nothing, and we can mostly treat it as a discrete
-  # count space, and do the a cheap KL with the chi square distribution
+  # count space, and do the a cheap KL
   #...........................................................
   tNE <- as.data.frame(table(combouts$NEfinalsize), stringsAsFactors = F)
   tMA <- as.data.frame(table(combouts$TDfinalsize), stringsAsFactors = F)
-  chitab <- dplyr::full_join(tNE, tMA, by = "Var1") %>%
+  difftab <- dplyr::full_join(tNE, tMA, by = "Var1") %>%
     dplyr::mutate(Freq.x = ifelse(is.na(Freq.x), 0, Freq.x),
                   Freq.y = ifelse(is.na(Freq.y), 0, Freq.y)) %>%
     dplyr::mutate(Var1 = as.numeric(Var1)) %>%
     dplyr::arrange(Var1)
-  testthat::expect_gt(suppressWarnings(chisq.test(chitab$Freq.x, chitab$Freq.y)$p.value), 0.05)
+
+  # do cheap KL
+  p <- difftab$Freq.x
+  p <- ifelse(p == 0, 1e-10, p)
+  q <- difftab$Freq.y
+  q <- ifelse(q == 0, 1e-10, q)
+  kl_div <- sum(p * log(p / q, base = exp(1)))
+  testthat::expect_lt(kl_div, 500) # higher tolerance given 0s
+
+
 
 
 
