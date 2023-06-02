@@ -5,7 +5,7 @@
 #' @param dur_I numeric; Duration of infection
 #' @param term_time numeric; time termination condition
 #' @param init_contact_mat matrix or sparseMatrix; User specified initial contact, or adjacency matrix.
-#' The contact matrix must be a symmetric square matrix, with a diagonal of 1 (for self),
+#' The contact matrix must be a symmetric square matrix, with a diagonal of 0 (for self),
 #' and have the same edge density, number of connections, for each node, or individual.
 #' Default value of NULL results in internal function generating initial contact matrix.
 #' @param initNC NC integer; initial connections; NB only used if an initial matrix is not provided.
@@ -25,7 +25,7 @@
 #' }
 #' @export
 
-sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
+sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
                               beta = rep(1, 10),
                               dur_I = 1,
                               init_contact_mat = NULL,
@@ -40,6 +40,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   #...........................................................
   goodegg::assert_single_int(Iseed)
   goodegg::assert_single_int(N)
+  goodegg::assert_single_numeric(term_time)
+  goodegg::assert_logical(return_contact_matrices)
 
   #.........................
   # initial contact adjacency matrix
@@ -48,7 +50,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   goodegg::assert_gr(rho, 0)
   if (!is.null(init_contact_mat)) { # User inputted matrix
     # custom assert
-    goodegg::assert_eq(sum(any(c("dgCMatrix", "matrix") %in% class(init_contact_mat))),
+    goodegg::assert_eq(sum(any(c("dgeMatrix", "dgCMatrix", "dsCMatrix", "matrix") %in% class(init_contact_mat))),
                        1,
                        message = "If user provides an initial contact matrix, it must be of class
                                   matrix or sparseMatrix (from the Matrix package).")
@@ -66,6 +68,7 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
                        message = "Diagonal should be population with 0 to represent self")
     # goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
     #                         message = "Each node, or individual, must have the same edge density for the initial contact matrix")
+    require(Matrix)
     conn <- as(init_contact_mat, "sparseMatrix") # rename
 
   } else if (any(c("dgeMatrix", "dgCMatrix", "dsCMatrix") %in% class(init_contact_mat))) {
@@ -91,9 +94,6 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
   if (is.vector(beta)) { # if beta is a vector make matrix but if it is a matrix, leave it alone
     goodegg::assert_vector(beta)
     goodegg::assert_length(beta, N, message = "Beta vector must be of same length as population size, N")
-    # lift over beta want B1 - BN as a column copied N times (square matrix with B varying by rows, so columns are replicates)
-    beta <- as(outer(beta, rep(1,N)), "sparseMatrix")
-
   } else if (is.matrix(beta)) {
     goodegg::assert_square_matrix(beta)
     goodegg::assert_length(nrow(beta), N, message = "Beta matrix must have square dimensions corresponding to population size, NxN")
@@ -130,6 +130,9 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     contact_store <- list(conn)
   }
 
+  # lift over beta want B1 - BN as a column copied N times (square matrix with B varying by rows, so columns are replicates)
+  beta <- outer(beta, rep(1,N))
+  diag(beta) <- 0
   #............................................................
   # run simulation based on rates and events
   #...........................................................
@@ -142,12 +145,8 @@ sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
     }
 
     # transmission rates
-    # frequency dependent by degree distribution
-    ni <- rowSums(as.matrix(conn))
-    ni <- 1/ni
-    ni <- outer(ni, rep(1,length(ni)))
     # NB: betaSI has elements beta_i,j * S_j * I_i * connections
-    betaSI <- as.matrix( beta * ni * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
+    betaSI <- as.matrix( beta * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
     # frequency dependent
     rate_t <- sum(betaSI) # transmission rate depending on overall kinetics
 
