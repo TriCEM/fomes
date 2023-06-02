@@ -1,6 +1,6 @@
 
 #' @title Initialize Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_SIR
+#' @inheritParams sim_Gillespie_nSIR
 #' @param sparseMatrix boolean; Whether the returned adjacency matrix should be formatted
 #' as a sparseMatrix
 #' @noMd
@@ -26,7 +26,7 @@ genInitialConnections <- function(initNC, N, sparseMatrix = TRUE) {
 
 
 #' @title Update Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_SIR
+#' @inheritParams sim_Gillespie_nSIR
 #' @param adjmat sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model
 #' @param sparseMatrix boolean; Whether the returned adjacency matrix should be formatted
 #' as a sparseMatrix
