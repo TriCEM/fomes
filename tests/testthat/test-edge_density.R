@@ -1,6 +1,6 @@
 
 test_that("Event types behaving: aka Rewiring matrices are less than or equal to rewiring events", {
-  out <- sim_Gillespie_SIR(Iseed = 1, N = 1e3,
+  out <- sim_Gillespie_nSIR(Iseed = 1, N = 1e3,
                            beta = rep(0.8, 1e3),
                            dur_I = 5,
                            rho = 100, # high rewiring rate
@@ -18,7 +18,7 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
   firstmat_edge_den <- list()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
+    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
                              rho = 1,
@@ -46,7 +46,7 @@ test_that("Rewiring Networks have Consistent Edge Density when initNC is used", 
   edge_den <- c()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
+    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
                              rho = 3, # medium rewiring rate
@@ -72,7 +72,7 @@ test_that("Rewiring Produces Consistent Switches", {
     contact_mat_length <- 0
     while (contact_mat_length < 2) {
 
-      out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+      out <- sim_Gillespie_nSIR(Iseed = 5, N = 10,
                                beta = rep(0.8, 10),
                                dur_I = 5,
                                rho = 10, # medium rewiring rate

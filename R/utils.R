@@ -97,5 +97,3 @@ tidy_traj_out <- function(x) {
   }
   return(as.data.frame(ret))
 }
-
-
