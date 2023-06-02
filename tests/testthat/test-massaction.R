@@ -5,7 +5,7 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   popsize <- 100
   duration_of_I <- 5
   initial_infxns <- 1
-  betaind <- 1
+  betaind <- 5e-3
   rhoconn <- 1e-100
   conmat <- matrix(1, popsize, popsize)
   diag(conmat) <- 0
@@ -25,13 +25,13 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
     #......................
     # dynamic network
     #......................
-    NEdynSIR <- suppressWarnings( fomes::sim_Gillespie_SIR(Iseed = initial_infxns,
-                                         N = popsize,
-                                         beta = rep(betaind, popsize),
-                                         dur_I = duration_of_I,
-                                         rho = rhoconn,
-                                         init_contact_mat = conmat,
-                                         term_time = Inf)
+    NEdynSIR <- suppressWarnings( fomes::sim_Gillespie_nSIR(Iseed = initial_infxns,
+                                                            N = popsize,
+                                                            beta = rep(betaind, popsize),
+                                                            dur_I = duration_of_I,
+                                                            rho = rhoconn,
+                                                            init_contact_mat = conmat,
+                                                            term_time = Inf)
     ) # warnings from igraph that we saturated network
 
     tidyNEdynSIR <- summary(NEdynSIR)
@@ -43,11 +43,11 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
     #......................
     # traditional model
     #......................
-    tradSIR <- fomes:::tradsim_Gillespie_SIR(Iseed = initial_infxns,
-                                             N = popsize,
-                                             beta = betaind,
-                                             dur_I = duration_of_I,
-                                             term_time = Inf)
+    tradSIR <- fomes:::sim_Gillespie_SIR(Iseed = initial_infxns,
+                                         N = popsize,
+                                         beta = betaind * popsize,
+                                         dur_I = duration_of_I,
+                                         term_time = Inf)
 
     # storage
     combouts[i, "TDfinalsize"] <- sum(tradSIR[1,c("Susc", "Infxn")]) - tradSIR[nrow(tradSIR), "Susc"]
@@ -77,8 +77,15 @@ test_that("Network Mass Action vs Traditional Gillespie are Essentially Same", {
   kl_div <- sum(p * log(p / q, base = exp(1)))
   testthat::expect_lt(kl_div, 500) # higher tolerance given 0s
 
-
-
-
+ #  #......................
+ #  # man viz
+ #  #......................
+ #  p1d <- tibble::tibble(fs = combouts$NEfinalsize, mod = "NE")
+ #  p2d <- tibble::tibble(fs = combouts$TDfinalsize, mod = "MA")
+ # dplyr::bind_rows(p1d, p2d)%>%
+ #    ggplot( aes(x = fs, fill = mod)) +
+ #    geom_histogram(alpha = 0.4, position = 'identity') +
+ #    scale_fill_manual(values = c("#fee391", "#a6bddb")) +
+ #    theme_linedraw()
 
 })
