@@ -2,7 +2,7 @@ test_that("Network continuous time and network discrete time are similar", {
   #............................................................
   # Magic Numbers
   #...........................................................
-  popsize <- 100
+  N <- 100
   duration_of_I <- 5
   initial_infxns <- 1
   betaind <- 0.15
@@ -10,7 +10,7 @@ test_that("Network continuous time and network discrete time are similar", {
   N <- 1e2
   conmat <- igraph::as_adjacency_matrix(
     igraph::degree.sequence.game(
-      out.deg = rep(floor(0.25*popsize), popsize), method = "vl"
+      out.deg = rep(floor(0.25*N), N), method = "vl"
     ), sparse = F)
   diag(conmat) <- 0
 
@@ -30,8 +30,8 @@ test_that("Network continuous time and network discrete time are similar", {
     # cont network
     #......................
     CTnSIR <- suppressWarnings( fomes::sim_Gillespie_nSIR(Iseed = initial_infxns,
-                                                          N = popsize,
-                                                          beta = rep(betaind, popsize),
+                                                          N = N,
+                                                          beta = rep(betaind, N),
                                                           dur_I = duration_of_I,
                                                           rho = rhoconn,
                                                           init_contact_mat = conmat,
@@ -46,15 +46,15 @@ test_that("Network continuous time and network discrete time are similar", {
     # discrete network
     #......................
     tradSIR <- fomes:::sim_DTDC_nSIR(Iseed = initial_infxns,
-                                     N = popsize,
-                                     beta = rep(betaind, popsize),
+                                     N = N,
+                                     beta = rep(betaind, N),
                                      dur_I = duration_of_I,
                                      init_contact_mat = conmat,
                                      time_steps = Inf)
 
     # storage
 
-    combouts[i, "DiscTimefinalsize"] <- popsize - tradSIR$Susc[length(tradSIR$Susc)]
+    combouts[i, "DiscTimefinalsize"] <- N - tradSIR$Susc[length(tradSIR$Susc)]
   }
 
   #............................................................
@@ -66,18 +66,14 @@ test_that("Network continuous time and network discrete time are similar", {
   tCT <- as.data.frame(table(combouts$ContTimefinalsize), stringsAsFactors = F)
   tDT <- as.data.frame(table(combouts$DiscTimefinalsize), stringsAsFactors = F)
   difftab <- dplyr::full_join(tCT, tDT, by = "Var1") %>%
-    dplyr::mutate(Freq.x = ifelse(is.na(Freq.x), 0, Freq.x),
-                  Freq.y = ifelse(is.na(Freq.y), 0, Freq.y)) %>%
     dplyr::mutate(Var1 = as.numeric(Var1)) %>%
     dplyr::arrange(Var1)
 
   # do cheap KL
   p <- difftab$Freq.x
-  p <- ifelse(p == 0, 1e-10, p)
   q <- difftab$Freq.y
-  q <- ifelse(q == 0, 1e-10, q)
-  kl_div <- sum(p * log(p / q, base = exp(1)))
-  testthat::expect_lt(kl_div, 500) # higher tolerance given 0s
+  kl_div <- sum(p * log(p / q, base = exp(1)), na.rm = T)
+  testthat::expect_lt(kl_div, 100) # higher tolerance given 0s
 
    #......................
    # man viz
