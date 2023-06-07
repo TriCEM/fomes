@@ -68,7 +68,7 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
                        message = "Diagonal should be population with 0 to represent self")
     # goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
     #                         message = "Each node, or individual, must have the same edge density for the initial contact matrix")
-    require(Matrix)
+    requireNamespace("Matrix")
     conn <- as(init_contact_mat, "sparseMatrix") # rename
 
   } else if (any(c("dgeMatrix", "dgCMatrix", "dsCMatrix") %in% class(init_contact_mat))) {
