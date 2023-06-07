@@ -75,16 +75,16 @@ test_that("Network continuous time and network discrete time are similar", {
   kl_div <- sum(p * log(p / q, base = exp(1)), na.rm = T)
   testthat::expect_lt(kl_div, 100) # higher tolerance given 0s
 
-   #......................
-   # man viz
-   #......................
-   p1d <- tibble::tibble(fs = combouts$ContTimefinalsize, mod = "Cont")
-   p2d <- tibble::tibble(fs = combouts$DiscTimefinalsize, mod = "Disc")
-  dplyr::bind_rows(p1d, p2d)%>%
-     ggplot( aes(x = fs, fill = mod)) +
-     geom_histogram(alpha = 0.4, position = 'identity') +
-     scale_fill_manual(values = c("#fee391", "#a6bddb")) +
-     theme_linedraw()
+  #  #......................
+  #  # man viz
+  #  #......................
+  #  p1d <- tibble::tibble(fs = combouts$ContTimefinalsize, mod = "Cont")
+  #  p2d <- tibble::tibble(fs = combouts$DiscTimefinalsize, mod = "Disc")
+  # dplyr::bind_rows(p1d, p2d)%>%
+  #    ggplot( aes(x = fs, fill = mod)) +
+  #    geom_histogram(alpha = 0.4, position = 'identity') +
+  #    scale_fill_manual(values = c("#fee391", "#a6bddb")) +
+  #    theme_linedraw()
 
 
 
