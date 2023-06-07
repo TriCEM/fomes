@@ -4,12 +4,15 @@
 \alias{rewireNEnodes}
 \title{Update Adjacency Matrix Connections}
 \usage{
-rewireNEnodes(adjmat = NULL, N)
+rewireNEnodes(adjmat = NULL, N, sparseMatrix = TRUE)
 }
 \arguments{
 \item{adjmat}{sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model}
 
 \item{N}{integer; population size}
+
+\item{sparseMatrix}{boolean; Whether the returned adjacency matrix should be formatted
+as a sparseMatrix}
 }
 \description{
 Update Adjacency Matrix Connections

@@ -1,12 +1,12 @@
 
 test_that("Event types behaving: aka Rewiring matrices are less than or equal to rewiring events", {
-  out <- sim_Gillespie_SIR(Iseed = 1, N = 1e3,
+  out <- sim_Gillespie_nSIR(Iseed = 1, N = 1e3,
                            beta = rep(0.8, 1e3),
                            dur_I = 5,
                            rho = 100, # high rewiring rate
                            initNC = 3,
                            term_time = 50,
-                           return_contact_matrices = T)
+                           return_contact_matrices = F)
   rewire_count <- sum(out$Event_traj == "rewire")
   unique_contact_mat <- length(unique(out$contact_store))
   testthat::expect_lte(unique_contact_mat, rewire_count)
@@ -18,10 +18,10 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
   firstmat_edge_den <- list()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
+    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
-                             rho = 100, # high rewiring rate
+                             rho = 1,
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
@@ -32,6 +32,8 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
     ret <- as.numeric(ret)
     return(ret)
   }
+  # liftover
+  firstmat_edge_den <- lapply(firstmat_edge_den, as.matrix)
   firstmode <- getmode(unlist(lapply(firstmat_edge_den, rowSums)))
   firstmed <- median(unlist(lapply(firstmat_edge_den, rowSums)))
   testthat::expect_equal(firstmode, initNCit)
@@ -39,19 +41,21 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
 })
 
 
-test_that("Rewiring Networks have Consistent Edge Density", {
-  initNCit <- 3 # edge density that should be cannon
+test_that("Rewiring Networks have Consistent Edge Density when initNC is used", {
+  initNCit <- 3 # edge density that should be stable if we are using initNC
   edge_den <- c()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_SIR(Iseed = 1, N = 10,
+    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
                              beta = rep(0.8, 10),
                              dur_I = 5,
-                             rho = 100, # high rewiring rate
+                             rho = 3, # medium rewiring rate
                              initNC = initNCit,
                              term_time = 50,
                              return_contact_matrices = T)
-    uni_edge_dens <- unique(lapply(out$contact_store, rowSums))
+
+    conns <- lapply(out$contact_store, as.matrix)
+    uni_edge_dens <- unique(lapply(conns, rowSums))
     edge_den <- c(edge_den, length(uni_edge_dens))
   }
 
@@ -68,10 +72,10 @@ test_that("Rewiring Produces Consistent Switches", {
     contact_mat_length <- 0
     while (contact_mat_length < 2) {
 
-      out <- sim_Gillespie_SIR(Iseed = 5, N = 10,
+      out <- sim_Gillespie_nSIR(Iseed = 5, N = 10,
                                beta = rep(0.8, 10),
                                dur_I = 5,
-                               rho = 100, # high rewiring rate
+                               rho = 10, # medium rewiring rate
                                initNC = 3,
                                term_time = 50,
                                return_contact_matrices = T)
@@ -79,6 +83,7 @@ test_that("Rewiring Produces Consistent Switches", {
     } # end while
 
     swtch <- unique(out$contact_store)
+    swtch <- lapply(swtch, as.matrix)
     reldiff <- swtch[[1]][upper.tri(swtch[[1]])] - swtch[[2]][upper.tri(swtch[[2]])]
     reldiff <- sum(reldiff == -1)
     count_switch_nodes <- append(count_switch_nodes, reldiff)

@@ -19,7 +19,8 @@ Imports:
     tibble,
     magrittr,
     dplyr,
-    crayon
+    crayon,
+    Matrix
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 

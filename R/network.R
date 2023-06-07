@@ -1,9 +1,11 @@
 
 #' @title Initialize Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_SIR
+#' @inheritParams sim_Gillespie_nSIR
+#' @param sparseMatrix boolean; Whether the returned adjacency matrix should be formatted
+#' as a sparseMatrix
 #' @noMd
 #' @export
-genInitialConnections <- function(initNC, N) {
+genInitialConnections <- function(initNC, N, sparseMatrix = TRUE) {
 
   # initial contacts, assume a binomial prob dist
   #initedgedens <- ceiling( N * (1 - exp(-rho)) ) # round to nearest whole number for edge (ceiling so always at least 1)
@@ -16,9 +18,7 @@ genInitialConnections <- function(initNC, N) {
   contactmat <- igraph::as_adjacency_matrix(net,
                                             type = "both",
                                             names = FALSE,
-                                            sparse = FALSE)
-  # is.Symmetric(conn) # must be true
-  # out
+                                            sparse = sparseMatrix)
   return(contactmat)
 }
 
@@ -26,12 +26,20 @@ genInitialConnections <- function(initNC, N) {
 
 
 #' @title Update Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_SIR
+#' @inheritParams sim_Gillespie_nSIR
 #' @param adjmat sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model
+#' @param sparseMatrix boolean; Whether the returned adjacency matrix should be formatted
+#' as a sparseMatrix
 #' @details Will sample a single pair of connections
 #' @noMd
 #' @export
-rewireNEnodes <- function(adjmat = NULL, N) {
+rewireNEnodes <- function(adjmat = NULL, N, sparseMatrix = TRUE) {
+
+  # temporarily convert sparseMatrix to base matrix for which
+  if (any(c("dgeMatrix", "dgCMatrix", "dsCMatrix") %in% class(adjmat))) {
+    adjmat <- as.matrix(adjmat)
+  }
+
   #............................................................
   # rewiring structure by randomly sampling two nodes with connection (arc)
   #   NB edge density does not change per node; just arcs between nodes
@@ -83,8 +91,10 @@ rewireNEnodes <- function(adjmat = NULL, N) {
   adjmat[cdnew[1], cdnew[2]] <- 1
   adjmat[cdnew[2], cdnew[1]] <- 1
 
-
   # out
+  if (sparseMatrix) {
+    adjmat <- as(adjmat, "sparseMatrix")
+  }
   return(adjmat)
 }
 
