@@ -16,7 +16,6 @@
 #' }
 #' @noMd
 #' @noRd
-#' @export
 # make invisible as use-case is for tests not general-purpose
 
 sim_DTDC_nSIR <- function(Iseed = 1, N = 10,
@@ -138,7 +137,6 @@ sim_DTDC_nSIR <- function(Iseed = 1, N = 10,
 #' notably drawing uncoupled times to events and events
 #' @noMd
 #' @noRd
-#' @export
 # make invisible as use-case is for tests not general-purpose
 
 sim_Gillespie_SIR <- function(Iseed = 1, N = 10,
