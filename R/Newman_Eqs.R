@@ -153,6 +153,8 @@ solve_newman_u <- function(transm, degdist, initu = 0.5, iters = 1e6, tol = 1e-5
   # core
   u <- initu  # starting value
   for (i in 1:iters) {
+    # G_1(x; T)= G_1(1+(x-1)T): therefore this gives the new U
+    # u RV w/r/t T parameter
     u_new <- get_newman_G1x(1 - transm + u *transm, degdist)
     if (abs(u_new - u) < tol) break  # break if change is very small, reached self-consistency
     u <- u_new
@@ -181,33 +183,37 @@ get_newman_transmissiblity <- function(taui, rij) {
   # tau is the duration of illness for individual i
   # like Newman, will assume simple uniform dist for 0 <= x <= rmax
   # although Newman summation goes to Inf, we only have support from a-b on our Unif Dist
+  # set maxes from empiric data
+  max_r <- max(rij)
+  max_t <- max(taui)
+
   #......................
   # integration
   #......................
-  P_r <- function(r){
-    dunif(r, min = 0, max = max_r)
+  P_r <- function(r, mnr){
+    dexp(r, rate = mnr)
   }
   # tau is the duration of illness for individual i
   # assuming discrete time for simplicity and uniform dist bouned by max time
   # therefore although Newman summation goes to Inf, we only have support from a-b on our Unif Dist
-  P_t <- function(t){
-    dunif(t, min = 0, max = max_t)
+  P_t <- function(t, mnt){
+    dexp(t, rate = mnt)
   }
-  # set maxes from empiric data
-  max_r <- max(rij)
-  mat_t <- max(taui)
+
 
   # Define the integrand
-  integrand <- function(rt) {
+  integrand <- function(rt, mnr, mnt) {
     r <- rt[1]
     t <- rt[2]
-    return(P_r(r) * P_t(t) * exp(-r*t))
+    return(P_r(r, mnr = mnr) * P_t(t, mnt = mnt) * exp(-r*t))
   }
 
   # Perform the double integral
   retinteg <- cubature::adaptIntegrate(integrand,
                                        lowerLimit = c(0, 0),
-                                       upperLimit = c(Inf, Inf))
+                                       upperLimit = c(Inf, Inf),
+                                       mnr = 1/max_r,
+                                       mnt = 1/max_t)
 
   #......................
   # out
@@ -274,7 +280,16 @@ get_newman_mean_final_epidemic_size <- function(graph, taui, rij,
   goodegg::assert_single_numeric(initu)
   goodegg::assert_bounded(initu, left = 0, right = 1, inclusive_left = T, inclusive_right = T)
 
-
+  #......................
+  # math notes
+  #......................
+  #
+  # here, we need S(T) = 1 - G0(u; T)
+  # where  G_0(x; T) = = \sum_{k=0}^infty p_k(1 - T + xT)^k = G_0(1+(x-1)T)
+  # AND
+  # u = G1(u; T) = H1(1; T) [as soln of self-consistency form]
+  # G_1(x; T)= G_1(1+(x-1)T): therefore this gives the new U
+  # u RV w/r/t T parameter
   #......................
   # core
   #......................
@@ -287,7 +302,8 @@ get_newman_mean_final_epidemic_size <- function(graph, taui, rij,
   }
   unow <- solve_newman_u(transm = transmnow, degdist = degdist,
                          initu = initu, iters = iters, tol = tol)
-  ret <- 1 - get_newman_G0x(x = unow, degdist = degdist)
+  RV <- (1 - transmnow + unow*transmnow)
+  ret <- 1 - get_newman_G0x(x = RV, degdist = degdist)
 
   #......................
   # out
