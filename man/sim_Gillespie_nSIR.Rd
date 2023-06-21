@@ -11,7 +11,6 @@ sim_Gillespie_nSIR(
   dur_I = 1,
   init_contact_mat = NULL,
   rho = 0.05,
-  initNC = NA,
   term_time = 500,
   return_contact_matrices = FALSE
 )
@@ -31,8 +30,6 @@ and have the same edge density, number of connections, for each node, or individ
 Default value of NULL results in internal function generating initial contact matrix.}
 
 \item{rho}{numeric; network rewiring rate}
-
-\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided.}
 
 \item{term_time}{numeric; time termination condition}
 

@@ -7,8 +7,6 @@
 genInitialConnections(initNC, N, sparseMatrix = TRUE)
 }
 \arguments{
-\item{initNC}{NC integer; initial connections; NB only used if an initial matrix is not provided.}
-
 \item{N}{integer; population size}
 
 \item{sparseMatrix}{boolean; Whether the returned adjacency matrix should be formatted
