@@ -1,17 +1,6 @@
-#' @title SIR NE Gillespie-Algorithm Simulation Model
-#' @param Iseed integer; Number of initial infections in the population
-#' @param N integer; population size
-#' @param beta numeric vector, matrix, or sparseMatrix; Probability of transmission given contact for S_i I_j elements
-#' @param dur_I numeric; Duration of infection
-#' @param term_time numeric; time termination condition
-#' @param init_contact_mat matrix or sparseMatrix; User specified initial contact, or adjacency matrix.
-#' The contact matrix must be a symmetric square matrix, with a diagonal of 0 (for self),
-#' and have the same edge density, number of connections, for each node, or individual.
-#' Default value of NULL results in internal function generating initial contact matrix.
-#' @param rho numeric; network rewiring rate
-#' @param return_contact_matrices boolean; Option to return contact matrices throughout dynamic iterations.
-#' Warning, this can be memory intensive.
-#' @description Gillespie Simulation
+#' @title SIR NE Gillespie-Tau-Leaping-Algorithm Simulation Model
+#' @inheritParams sim_Gillespie_nSIR
+#' @param tau numeric; Tau step for efficient (but approximate) stochastic simulation\#' @description Gillespie Simulation
 #' @details Assuming:
 #' \itemize{
 #'     closed population
@@ -24,13 +13,16 @@
 #' }
 #' @export
 
-sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
-                              beta = rep(1, 10),
-                              dur_I = 1,
-                              init_contact_mat = NULL,
-                              rho = 0.05,
-                              term_time = 500,
-                              return_contact_matrices = FALSE) {
+
+
+sim_tauGillespie_nSIR <- function(Iseed = 1, N = 10,
+                                  beta = rep(1, 10),
+                                  dur_I = 1,
+                                  init_contact_mat = NULL,
+                                  rho = 0.05,
+                                  tau = 1,
+                                  term_time = 500,
+                                  return_contact_matrices = FALSE) {
   # runtime
   starttime <- Sys.time()
   #............................................................
@@ -40,7 +32,7 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
   goodegg::assert_single_int(N)
   goodegg::assert_single_numeric(term_time)
   goodegg::assert_logical(return_contact_matrices)
-
+  goodegg::assert_single_numeric(tau)
   #.........................
   # initial contact adjacency matrix
   #.........................
@@ -114,7 +106,7 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
   S_traj <- list(S_now)
   I_traj <- list(I_now)
   R_traj <- list(R_now)
-  event_traj <- c("init")
+  event_traj <- list("init" = list("Ic" = I_now, "Rc" = R_now, "Rewirec" = 0))
   if (return_contact_matrices) {
     contact_store <- list(conn)
   }
@@ -132,7 +124,6 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
     if (sum(I_now) == 0) {
       break
     }
-
     # catch - if all recovered/immune, exit loop
     if (sum(R_now) == N) {
       break
@@ -148,59 +139,74 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
     now_dur_I <- (1/dur_I) * I_now
     rate_r <- sum(now_dur_I)
 
-    # Calculate time until each of the events occurs
-    event <- c("rewire" = Inf,
-               "transmission" = Inf,
-               "recovery" = Inf)
-    if (rate_t > 0) {
-      event[["rewire"]] <- stats::rexp(1, rho)
-    }
-    if (rate_t > 0) {
-      event[["transmission"]] <- stats::rexp(1, rate_t)
-    }
-    if (rate_r > 0) {
-      event[["recovery"]] <- stats::rexp(1, rate_r)
-    }
+    # Determine number of events in period of time: t, t+tau
+    num_rw <- rpois(1, rho * tau)
+    num_SI <- rpois(1, rate_t * tau)
+    num_IR <- rpois(1, rate_r * tau)
 
-    # Get the event that will occur first, and the time that will take
-    next_event <- names(event)[which(event == min(event))]
-
-    # Jump to that time
-    currtime <- currtime + event[[next_event]]
-
-    # make change for earliest event
-    if (next_event == "rewire") {
-      # rewire a pair of nodes
-      conn <- rewireNEnodes(adjmat = conn, N = N, sparseMatrix = T)
-    } else if (next_event == "transmission") {
+    #..............................
+    # implement tau jumped changes
+    #..............................
+    #......................
+    # rewiring changes
+    #......................
+    if (num_rw > 0) {
+      for (i in 1:num_rw) {
+        conn <- rewireNEnodes(adjmat = conn, N = N, sparseMatrix = T)
+      }
+    }
+    #......................
+    # transmission changes
+    #......................
+    if (num_SI > 0) {
+      # catch if we have exceed our susceptible pool - but b/c we sample w/ replacement based on limited susc by contact matrix, this can be excluded
+      # num_SI <- ifelse(num_SI > sum(S_now), sum(S_now), num_SI)
       # Choose infector node based on transmission rates
       ind_probs <- rowSums(betaSI) / rate_t # sum is over the columns (i.e. the S_pops)
-      parent_pop <- sample(Inds, size = 1, prob = ind_probs)
-
+      # now draw parent pop where infxns are coming from
+      parent_pop <- sample(Inds, size = num_SI, prob = ind_probs, replace = T) # same individual can infect in our time interval
       # Choose susceptible based on probability of becoming infxn
-      ind_probs <- betaSI[parent_pop,] / sum(betaSI[parent_pop,])
-      child_pop <- sample(Inds, size = 1, prob = ind_probs)
+      ind_probs <- betaSI[parent_pop,] / rowSums(betaSI[parent_pop,])
+      # but this must be new infxns, so must iteratively update our ind_probs
+      child_pop <- rep(NA, num_SI)
+      for (i in 1:num_SI) {
+        child_pop[i] <- sample(Inds, size = 1, prob = ind_probs[i,], replace = F)
+        # ind_probs[, child_pop[i] ] <- 0 would like to say that you can no longer pick this individual but because of contact matrix, we are limited in our susceptible pool even further
+      }
 
       # population level updates
       S_now[child_pop] <- S_now[child_pop] - 1
       I_now[child_pop] <- I_now[child_pop] + 1
-
-    } else if (next_event == "recovery") { # If recovery occurs first
-      # Choose recovery pop based on recovery rates
-      ind_probs <- now_dur_I / rate_r
-      recoveree_pop <- sample(Inds, size = 1, prob = ind_probs)
-
-      # population level updates
-      I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
-      R_now[recoveree_pop] <- R_now[recoveree_pop] + 1
     }
+    #......................
+    # recovery changes
+    #......................
+    if (num_IR > 0) {
+    # Choose recovery pop based on recovery rates
+    ind_probs <- now_dur_I / rate_r
+    # but catch if we have exceeded our infected pool
+    num_IR <- ifelse(num_IR > sum(I_now), sum(I_now), num_IR)
+    recoveree_pop <- sample(Inds, size = num_IR, prob = ind_probs)
+
+    # population level updates
+    I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
+    R_now[recoveree_pop] <- R_now[recoveree_pop] + 1
+    }
+
+    #......................
+    # Add time
+    #......................
+    currtime <- currtime + tau
+
 
     # Update lists and time vec
     Time_traj <- c(Time_traj, currtime)
     S_traj <- append(S_traj, list(S_now))
     I_traj <- append(I_traj, list(I_now))
     R_traj <- append(R_traj, list(R_now))
-    event_traj <- c(event_traj, next_event)
+    new_event <- list(list("Ic" = num_SI, "Rc" = num_IR, "Rewirec" = num_rw))
+    names(new_event) <- paste0("currtime", currtime)
+    event_traj <- c(event_traj, new_event)
     if (return_contact_matrices) {
       contact_store <- append(contact_store, list(conn))
     }
@@ -221,7 +227,6 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
   }
 
   # add S3 class structure
-  attr(out, "class") <- "GillespieSIRne"
+  attr(out, "class") <- "TauGillespieSIRne"
   return(out)
 }
-
