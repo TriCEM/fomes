@@ -1,10 +1,11 @@
 test_that("Gillespie Network CT model runs", {
+  # network
   N <- 1e2
   init_contact_mat <- igraph::as_adjacency_matrix(
     igraph::degree.sequence.game(
       out.deg = rep(floor(0.25*N), N), method = "vl"
     ), sparse = F)
-
+  # run
   out <- sim_Gillespie_nSIR(Iseed = 1, N = N,
                             beta = rep(0.5, N),
                             dur_I = 5,
@@ -33,13 +34,13 @@ test_that("tradiational Gillespie MA model runs", {
 
 
 test_that("Gillespie Network DTDC model runs", {
+  # network
   N <- 1e2
   init_contact_mat <- igraph::as_adjacency_matrix(
     igraph::degree.sequence.game(
       out.deg = rep(floor(0.25*N), N), method = "vl"
     ), sparse = F)
-
-
+  # run
   out <- fomes:::sim_DTDC_nSIR(Iseed = 1, N = N,
                                beta = rep(1, N),
                                dur_I = 5,
@@ -55,12 +56,13 @@ test_that("Gillespie Network DTDC model runs", {
 
 
 test_that("Gillespie Network Tau Leaping model runs", {
+  # network
   N <- 1e2
   init_contact_mat <- igraph::as_adjacency_matrix(
     igraph::degree.sequence.game(
       out.deg = rep(floor(0.25*N), N), method = "vl"
     ), sparse = F)
-
+  # run model
   out <- sim_tauGillespie_nSIR(Iseed = 1, N = N,
                                beta = rep(0.5, N),
                                dur_I = 5,

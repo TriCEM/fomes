@@ -1,10 +1,17 @@
 
 test_that("Event types behaving: aka Rewiring matrices are less than or equal to rewiring events", {
-  out <- sim_Gillespie_nSIR(Iseed = 1, N = 1e3,
-                           beta = rep(0.8, 1e3),
+  # network
+  N <- 1e2
+  init_contact_mat <- igraph::as_adjacency_matrix(
+    igraph::degree.sequence.game(
+      out.deg = rep(floor(0.25*N), N), method = "vl"
+    ), sparse = F)
+  # run of model
+   out <- sim_Gillespie_nSIR(Iseed = 1, N = N,
+                           beta = rep(0.8, N),
                            dur_I = 5,
                            rho = 100, # high rewiring rate
-                           initNC = 3,
+                           init_contact_mat = init_contact_mat,
                            term_time = 50,
                            return_contact_matrices = F)
   rewire_count <- sum(out$Event_traj == "rewire")
@@ -14,15 +21,23 @@ test_that("Event types behaving: aka Rewiring matrices are less than or equal to
 
 
 test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
-  initNCit <- 3 # edge density that should be cannon
+  # network
+  N <- 1e2
+  mydef <- 3
+  init_contact_mat <- igraph::as_adjacency_matrix(
+    igraph::degree.sequence.game(
+      out.deg = rep(mydef, N), method = "vl" # edge density that should be cannon
+    ), sparse = F)
+
+  # check
   firstmat_edge_den <- list()
   # iter it out
   for (i in 1:10) {
-    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
-                             beta = rep(0.8, 10),
+    out <- sim_Gillespie_nSIR(Iseed = 1, N = N,
+                             beta = rep(0.8, N),
                              dur_I = 5,
                              rho = 1,
-                             initNC = initNCit,
+                             init_contact_mat = init_contact_mat,
                              term_time = 50,
                              return_contact_matrices = T)
     firstmat_edge_den <- append(firstmat_edge_den, out$contact_store[1])
@@ -36,35 +51,22 @@ test_that("Initial Network has Consistent MODE/MEDIAN Edge Density", {
   firstmat_edge_den <- lapply(firstmat_edge_den, as.matrix)
   firstmode <- getmode(unlist(lapply(firstmat_edge_den, rowSums)))
   firstmed <- median(unlist(lapply(firstmat_edge_den, rowSums)))
-  testthat::expect_equal(firstmode, initNCit)
-  testthat::expect_equal(firstmed, initNCit)
+  testthat::expect_equal(firstmode, mydef)
+  testthat::expect_equal(firstmed, mydef)
 })
 
-
-test_that("Rewiring Networks have Consistent Edge Density when initNC is used", {
-  initNCit <- 3 # edge density that should be stable if we are using initNC
-  edge_den <- c()
-  # iter it out
-  for (i in 1:10) {
-    out <- sim_Gillespie_nSIR(Iseed = 1, N = 10,
-                             beta = rep(0.8, 10),
-                             dur_I = 5,
-                             rho = 3, # medium rewiring rate
-                             initNC = initNCit,
-                             term_time = 50,
-                             return_contact_matrices = T)
-
-    conns <- lapply(out$contact_store, as.matrix)
-    uni_edge_dens <- unique(lapply(conns, rowSums))
-    edge_den <- c(edge_den, length(uni_edge_dens))
-  }
-
-  edden <- unique(edge_den)
-  testthat::expect_length(edden, 1)
-})
 
 
 test_that("Rewiring Produces Consistent Switches", {
+  # network
+  N <- 1e2
+  init_contact_mat <- igraph::as_adjacency_matrix(
+    igraph::degree.sequence.game(
+      out.deg = rep(3, N), method = "vl" # edge density that should be cannon
+    ), sparse = F)
+
+
+
   # tracker
   count_switch_nodes <- list()
   # do a series of iters
@@ -72,11 +74,11 @@ test_that("Rewiring Produces Consistent Switches", {
     contact_mat_length <- 0
     while (contact_mat_length < 2) {
 
-      out <- sim_Gillespie_nSIR(Iseed = 5, N = 10,
-                               beta = rep(0.8, 10),
+      out <- sim_Gillespie_nSIR(Iseed = 5, N = N,
+                               beta = rep(0.8, N),
                                dur_I = 5,
                                rho = 10, # medium rewiring rate
-                               initNC = 3,
+                               init_contact_mat = init_contact_mat,
                                term_time = 50,
                                return_contact_matrices = T)
       contact_mat_length <- length(unique(out$contact_store))

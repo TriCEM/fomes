@@ -133,11 +133,6 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
       break
     }
 
-    # catch - if all recovered/immune, exit loop
-    if (sum(R_now) == N) {
-      break
-    }
-
     # transmission rates
     # NB: betaSI has elements beta_i,j * S_j * I_i * connections
     betaSI <- as.matrix( beta * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
