@@ -124,10 +124,6 @@ sim_tauGillespie_nSIR <- function(Iseed = 1, N = 10,
     if (sum(I_now) == 0) {
       break
     }
-    # catch - if all recovered/immune, exit loop
-    if (sum(R_now) == N) {
-      break
-    }
 
     # transmission rates
     # NB: betaSI has elements beta_i,j * S_j * I_i * connections
