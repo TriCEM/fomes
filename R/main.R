@@ -8,7 +8,6 @@
 #' The contact matrix must be a symmetric square matrix, with a diagonal of 0 (for self),
 #' and have the same edge density, number of connections, for each node, or individual.
 #' Default value of NULL results in internal function generating initial contact matrix.
-#' @param initNC NC integer; initial connections; NB only used if an initial matrix is not provided.
 #' @param rho numeric; network rewiring rate
 #' @param return_contact_matrices boolean; Option to return contact matrices throughout dynamic iterations.
 #' Warning, this can be memory intensive.
@@ -30,7 +29,6 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
                               dur_I = 1,
                               init_contact_mat = NULL,
                               rho = 0.05,
-                              initNC = NA,
                               term_time = 500,
                               return_contact_matrices = FALSE) {
   # runtime
@@ -48,16 +46,13 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
   #.........................
   goodegg::assert_single_numeric(rho)
   goodegg::assert_gr(rho, 0)
+  goodegg::assert_non_null(init_contact_mat, message = "User must input an initial contact matrix")
   if (!is.null(init_contact_mat)) { # User inputted matrix
     # custom assert
     goodegg::assert_eq(sum(any(c("dgeMatrix", "dgCMatrix", "dsCMatrix", "matrix") %in% class(init_contact_mat))),
                        1,
-                       message = "If user provides an initial contact matrix, it must be of class
+                       message = "Tbe initial contact matrix must be of class
                                   matrix or sparseMatrix (from the Matrix package).")
-    if(!is.na(initNC)) {
-      warning("The user has provided an initial contact matrix, the initial connection rate will be ignored")
-    }
-
   }
 
   if (is.matrix(init_contact_mat)) { # catch different type of contact matrix options
@@ -80,12 +75,6 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
     # goodegg::assert_length(unique(rowSums(init_contact_mat)), 1,
     #                         message = "Each node, or individual, must have the same edge density for the initial contact matrix")
     conn <- init_contact_mat # rename
-
-  } else { # user did not input matrix and we will generate one using the degree sequence game
-    goodegg::assert_single_int(initNC)
-    goodegg::assert_le(initNC, N)
-    # simulate initial contact matrix
-    conn <- genInitialConnections(initNC, N, sparseMatrix = TRUE)
   }
   #.........................
   # SIR params
@@ -144,6 +133,11 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
       break
     }
 
+    # catch - if all recovered/immune, exit loop
+    if (sum(R_now) == N) {
+      break
+    }
+
     # transmission rates
     # NB: betaSI has elements beta_i,j * S_j * I_i * connections
     betaSI <- as.matrix( beta * outer(I_now, S_now) * conn ) # need to reduce class to matrix for downstream indexing
@@ -194,7 +188,7 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
     } else if (next_event == "recovery") { # If recovery occurs first
       # Choose recovery pop based on recovery rates
       ind_probs <- now_dur_I / rate_r
-      recoveree_pop <- sample(Inds, 1, prob = ind_probs)
+      recoveree_pop <- sample(Inds, size = 1, prob = ind_probs)
 
       # population level updates
       I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
