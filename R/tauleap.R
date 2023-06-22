@@ -162,12 +162,16 @@ sim_tauGillespie_nSIR <- function(Iseed = 1, N = 10,
       # now draw parent pop where infxns are coming from
       parent_pop <- sample(Inds, size = num_SI, prob = ind_probs, replace = T) # same individual can infect in our time interval
       # Choose susceptible based on probability of becoming infxn
-      ind_probs <- betaSI[parent_pop,] / rowSums(betaSI[parent_pop,])
-      # but this must be new infxns, so must iteratively update our ind_probs
-      child_pop <- rep(NA, num_SI)
-      for (i in 1:num_SI) {
-        child_pop[i] <- sample(Inds, size = 1, prob = ind_probs[i,], replace = F)
-        # ind_probs[, child_pop[i] ] <- 0 would like to say that you can no longer pick this individual but because of contact matrix, we are limited in our susceptible pool even further
+      if (length(parent_pop) == 1) { # catch if only 1 new infxn
+        ind_probs <- betaSI[parent_pop,] / sum(betaSI[parent_pop,])
+        child_pop <- sample(Inds, size = 1, prob = ind_probs, replace = F)
+      } else {
+        ind_probs <- betaSI[parent_pop,] / rowSums(betaSI[parent_pop,])
+        child_pop <- rep(NA, num_SI)
+        for (i in 1:num_SI) {
+          child_pop[i] <- sample(Inds, size = 1, prob = ind_probs[i,], replace = F)
+          # ind_probs[, child_pop[i] ] <- 0 would like to say that you can no longer pick this individual but because of contact matrix, we are limited in our susceptible pool even further
+        }
       }
 
       # population level updates
@@ -178,15 +182,15 @@ sim_tauGillespie_nSIR <- function(Iseed = 1, N = 10,
     # recovery changes
     #......................
     if (num_IR > 0) {
-    # Choose recovery pop based on recovery rates
-    ind_probs <- now_dur_I / rate_r
-    # but catch if we have exceeded our infected pool
-    num_IR <- ifelse(num_IR > sum(I_now), sum(I_now), num_IR)
-    recoveree_pop <- sample(Inds, size = num_IR, prob = ind_probs)
+      # Choose recovery pop based on recovery rates
+      ind_probs <- now_dur_I / rate_r
+      # but catch if we have exceeded our infected pool
+      num_IR <- ifelse(num_IR > sum(I_now), sum(I_now), num_IR)
+      recoveree_pop <- sample(Inds, size = num_IR, prob = ind_probs)
 
-    # population level updates
-    I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
-    R_now[recoveree_pop] <- R_now[recoveree_pop] + 1
+      # population level updates
+      I_now[recoveree_pop] <- I_now[recoveree_pop] - 1
+      R_now[recoveree_pop] <- R_now[recoveree_pop] + 1
     }
 
     #......................
@@ -210,9 +214,9 @@ sim_tauGillespie_nSIR <- function(Iseed = 1, N = 10,
 
   # out
   out <- list(
-    S_traj = tidy_traj_out(S_traj),
-    I_traj = tidy_traj_out(I_traj),
-    R_traj = tidy_traj_out(R_traj),
+    S_traj = S_traj,
+    I_traj = I_traj,
+    R_traj = R_traj,
     Event_traj = event_traj,
     Time_traj = Time_traj,
     runTime = round(Sys.time() - starttime, 2)
