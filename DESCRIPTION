@@ -20,7 +20,8 @@ Imports:
     magrittr,
     dplyr,
     crayon,
-    Matrix
+    Matrix,
+    cubature
 Remotes:
     nickbrazeau/goodegg,
 Suggests: 

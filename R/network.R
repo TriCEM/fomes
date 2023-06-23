@@ -1,30 +1,3 @@
-
-#' @title Initialize Adjacency Matrix Connections
-#' @inheritParams sim_Gillespie_nSIR
-#' @param sparseMatrix boolean; Whether the returned adjacency matrix should be formatted
-#' as a sparseMatrix
-#' @noMd
-#' @export
-genInitialConnections <- function(initNC, N, sparseMatrix = TRUE) {
-
-  # initial contacts, assume a binomial prob dist
-  #initedgedens <- ceiling( N * (1 - exp(-rho)) ) # round to nearest whole number for edge (ceiling so always at least 1)
-  #initedgedens <- initNC
-
-  #............................................................
-  # using igraph as workhorse here
-  #...........................................................
-  net <- igraph::degree.sequence.game(rep(initNC, N), method = "vl")
-  contactmat <- igraph::as_adjacency_matrix(net,
-                                            type = "both",
-                                            names = FALSE,
-                                            sparse = sparseMatrix)
-  return(contactmat)
-}
-
-
-
-
 #' @title Update Adjacency Matrix Connections
 #' @inheritParams sim_Gillespie_nSIR
 #' @param adjmat sparse matrix; adjacency contact matrix that will be rewired using the neighbor exchange model
