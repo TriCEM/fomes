@@ -181,8 +181,6 @@ get_newman_transmissiblity <- function(taui, rij) {
 
   # rij is average rate of disease-causing contacts between infected i and susceptible j
   # tau is the duration of illness for individual i
-  # like Newman, will assume simple uniform dist for 0 <= x <= rmax
-  # although Newman summation goes to Inf, we only have support from a-b on our Unif Dist
   # set maxes from empiric data
   max_r <- max(rij)
   max_t <- max(taui)
@@ -194,8 +192,6 @@ get_newman_transmissiblity <- function(taui, rij) {
     dexp(r, rate = mnr)
   }
   # tau is the duration of illness for individual i
-  # assuming discrete time for simplicity and uniform dist bouned by max time
-  # therefore although Newman summation goes to Inf, we only have support from a-b on our Unif Dist
   P_t <- function(t, mnt){
     dexp(t, rate = mnt)
   }
