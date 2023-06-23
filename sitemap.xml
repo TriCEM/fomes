@@ -28,9 +28,6 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/genInitialConnections.html</loc>
-  </url>
-  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -44,6 +41,9 @@
   </url>
   <url>
     <loc>/reference/sim_Gillespie_nSIR.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sim_tauGillespie_nSIR.html</loc>
   </url>
   <url>
     <loc>/reference/summary.GillespieSIRne.html</loc>
