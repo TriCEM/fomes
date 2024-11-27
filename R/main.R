@@ -147,7 +147,7 @@ sim_Gillespie_nSIR <- function(Iseed = 1, N = 10,
     event <- c("rewire" = Inf,
                "transmission" = Inf,
                "recovery" = Inf)
-    if (rate_t > 0) {
+    if (rate_t > 0) { # only rewire while infections are propagating, otherwise negligible behavior on model
       event[["rewire"]] <- stats::rexp(1, rho)
     }
     if (rate_t > 0) {
